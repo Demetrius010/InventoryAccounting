@@ -1,5 +1,7 @@
 package com.company.inventoryaccounting;
 
+
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
@@ -101,8 +103,9 @@ public class MainActivity extends AppCompatActivity {
     public void onLogin(View view){
         String phone = etPhone.getText().toString().replace("+7", "").replaceAll("[^\\d]", "");
         String type = "login";
-        Log.d("Value", "Phone = " + phone);
-        Backend backendLogin = new Backend(this);
-        backendLogin.execute(type, phone);
+        //BackgroundWorker backgroundWorkerLogin = new BackgroundWorker(this);
+        //backgroundWorkerLogin.execute(type, phone);
+        Intent intent = new Intent(".MainMenuActivity");
+        startActivity(intent);
     }
 }

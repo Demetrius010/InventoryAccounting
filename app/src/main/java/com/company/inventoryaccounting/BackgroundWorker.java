@@ -2,7 +2,9 @@ package com.company.inventoryaccounting;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -17,23 +19,23 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 
-public class Backend extends AsyncTask<String,Void,String> {
+public class BackgroundWorker extends AsyncTask<String,Void,String> {
     Context context;
     AlertDialog alertDialog;
 
-    Backend(Context ctx){
+    BackgroundWorker(Context ctx){
         context = ctx;
     }
+
 
     @Override
     protected String doInBackground(String... params) {
         String type = params[0];
-        String login_url = "http://37.20.16.44:8080/login.php";
+        String login_url = "http://192.168.1.2:8080/login.php";//"http://37.20.16.44:8080/login.php";
         //String register_url = "http://37.20.16.44:8080/register.php";
         if(type.equals("login")){
             try {
-                String user_name = params[1];
-                String password = params[2];
+                String phone = params[1];
                 URL url = new URL(login_url);
                 HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
                 httpURLConnection.setRequestMethod("POST");
@@ -41,8 +43,7 @@ public class Backend extends AsyncTask<String,Void,String> {
                 httpURLConnection.setDoInput(true);
                 OutputStream outputStream = httpURLConnection.getOutputStream();
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-                String post_data = URLEncoder.encode("user_name", "UTF-8") + "=" + URLEncoder.encode(user_name, "UTF-8") + "&"
-                        + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(password, "UTF-8");
+                String post_data = URLEncoder.encode("phone", "UTF-8") + "=" + URLEncoder.encode(phone, "UTF-8");
                 bufferedWriter.write(post_data);
                 bufferedWriter.flush();
                 bufferedWriter.close();
