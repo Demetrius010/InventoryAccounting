@@ -10,15 +10,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BackgroundWorkerResponse {
 
-    EditText etPhone;
+    EditText etPhone, etPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         etPhone = (EditText)findViewById(R.id.etPhone);
+        etPassword = (EditText)findViewById(R.id.etPassword);
 
         phoneMaskInput();
     }
@@ -101,11 +102,27 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void onLogin(View view){
-        String phone = etPhone.getText().toString().replace("+7", "").replaceAll("[^\\d]", "");
         String type = "login";
+        String phone = etPhone.getText().toString().replace("+7", "").replaceAll("[^\\d]", "");
+        String password = etPassword.getText().toString();
         //BackgroundWorker backgroundWorkerLogin = new BackgroundWorker(this);
         //backgroundWorkerLogin.execute(type, phone);
-        Intent intent = new Intent(".MainMenuActivity");
-        startActivity(intent);
+        new BackgroundWorker(this, this).execute(type, phone, password);
+    }
+
+    @Override
+    public void processFinish(String output) {
+        if(output.equals("Login success")){
+            if(!(etPassword.getText().toString().equals("")))
+            {
+                ((GlobalInventoryaccounting)this.getApplication()).setAdminFlag(true);
+            }
+            else {
+                ((GlobalInventoryaccounting)this.getApplication()).setAdminFlag(false);
+            }
+            Intent intent = new Intent(".MainMenuActivity");
+            //intent.putExtra("NAME", Value); in new act in onCreate() {.... variable = getIntent().getExtras().getString("NAME")}
+            startActivity(intent);
+        }
     }
 }

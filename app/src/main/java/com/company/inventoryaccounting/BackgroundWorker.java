@@ -23,7 +23,11 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
     Context context;
     AlertDialog alertDialog;
 
-    BackgroundWorker(Context ctx){
+
+    public BackgroundWorkerResponse delegate = null;
+
+    public BackgroundWorker(Context ctx, BackgroundWorkerResponse delegate){
+        this.delegate = delegate;
         context = ctx;
     }
 
@@ -33,9 +37,11 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
         String type = params[0];
         String login_url = "http://192.168.1.2:8080/login.php";//"http://37.20.16.44:8080/login.php";
         //String register_url = "http://37.20.16.44:8080/register.php";
+        String json_url = "http://192.168.1.2:8080/json_get_data.php";
         if(type.equals("login")){
             try {
                 String phone = params[1];
+                String password = params [2];
                 URL url = new URL(login_url);
                 HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
                 httpURLConnection.setRequestMethod("POST");
@@ -43,7 +49,8 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 httpURLConnection.setDoInput(true);
                 OutputStream outputStream = httpURLConnection.getOutputStream();
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-                String post_data = URLEncoder.encode("phone", "UTF-8") + "=" + URLEncoder.encode(phone, "UTF-8");
+                String post_data = URLEncoder.encode("phone", "UTF-8") + "=" + URLEncoder.encode(phone, "UTF-8") + "&"
+                        + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(password, "UTF-8");
                 bufferedWriter.write(post_data);
                 bufferedWriter.flush();
                 bufferedWriter.close();
@@ -59,6 +66,26 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 inputStream.close();
                 httpURLConnection.disconnect();
                 return result;
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        else if(type.equals("getdata")){
+            try {
+                String jsonString;
+                URL url = new URL(json_url);
+                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((jsonString = bufferedReader.readLine())!= null)
+                {
+                    stringBuilder.append(jsonString+"\n");
+
+                }
+                return stringBuilder.toString().trim();
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e){
@@ -110,14 +137,16 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
 
     @Override
     protected void onPreExecute() {
-        alertDialog = new AlertDialog.Builder(context).create();
-        alertDialog.setTitle("Login Status");
+        //alertDialog = new AlertDialog.Builder(context).create();
+        //alertDialog.setTitle("Login Status");
     }
 
     @Override
     protected void onPostExecute(String result) {
-        alertDialog.setMessage(result);
-        alertDialog.show();
+        //alertDialog.setMessage(result);
+        //alertDialog.show();
+        delegate.processFinish(result);
+        //Log.d("Value", "result= " + result);
     }
 
     @Override
