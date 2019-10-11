@@ -37,7 +37,7 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
         String type = params[0];
         String login_url = "http://192.168.1.2:8080/login.php";//"http://37.20.16.44:8080/login.php";
         //String register_url = "http://37.20.16.44:8080/register.php";
-        String json_url = "http://192.168.1.2:8080/json_get_data.php";
+        String json_url = "http://192.168.1.2:8080/getAddresses.php";
         if(type.equals("login")){
             try {
                 String phone = params[1];
@@ -72,7 +72,7 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 e.printStackTrace();
             }
         }
-        else if(type.equals("getdata")){
+        else if(type.equals("getAddresses")){
             try {
                 String jsonString;
                 URL url = new URL(json_url);

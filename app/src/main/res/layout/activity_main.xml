@@ -56,6 +56,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:ems="10"
+        android:cursorVisible="false"
         android:hint="admin only"
         android:ellipsize="start"
         android:gravity="center_horizontal"

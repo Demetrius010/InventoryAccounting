@@ -4,15 +4,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainMenuActivity extends AppCompatActivity implements BackgroundWorkerResponse {
 
     Button btnAllEquip, btnBrokenEquip, btnEquipUnderRepair, bntAddNewPlace, btnAddNewEquip;
+    Spinner spnAddress;
     JSONObject jsonObject;
     JSONArray jsonArray;
 
@@ -25,6 +31,13 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
         btnEquipUnderRepair = (Button)findViewById(R.id.btnEquipUnderRepair);
         bntAddNewPlace = (Button)findViewById(R.id.bntAddNewPlace);
         btnAddNewEquip = (Button)findViewById(R.id.btnAddNewEquip);
+        spnAddress = (Spinner)findViewById(R.id.spnAddress);
+
+        ifAdmin();
+        getAddresses();
+    }
+
+    private void ifAdmin(){
         if (((GlobalInventoryaccounting) this.getApplication()).isAdmin())
         {
             Log.d("Value","admin = " + ((GlobalInventoryaccounting) this.getApplication()).isAdmin());
@@ -37,24 +50,32 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
         }
     }
 
-    public void onAllEquipButton(View view){
-        String type = "getdata";
+    private  void getAddresses(){
+        String type = "getAddresses";
         new BackgroundWorker(this, this).execute(type);
+    }
+
+    public void onAllEquipButton(View view){
+
     }
 
     @Override
     public void processFinish(String output) {
-        String phone, password;
+
         try {
+            String address;
+            List<String> allAddresses = new ArrayList<String>();
             jsonObject = new JSONObject(output);
             jsonArray = jsonObject.getJSONArray("server_response");
             for(int i = 0; i < jsonArray.length(); i++){
                 JSONObject jsonObj = jsonArray.getJSONObject(i);
-                phone = jsonObj.getString("phone");
-                password = jsonObj.getString("password");
-                Log.d("Value","phone =" + phone);
-                Log.d("Value","password =" + password);
+                address = jsonObj.getString("short_address");
+                allAddresses.add(address);
+                //Log.d("Value","address =" + address);
             }
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allAddresses);
+            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spnAddress.setAdapter(dataAdapter);
         } catch (JSONException e) {
             e.printStackTrace();
         }
