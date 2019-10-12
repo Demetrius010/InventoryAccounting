@@ -111,18 +111,20 @@ public class MainActivity extends AppCompatActivity implements BackgroundWorkerR
     }
 
     @Override
-    public void processFinish(String output) {
-        if(output.equals("Login success")){
-            if(!(etPassword.getText().toString().equals("")))
-            {
-                ((GlobalInventoryaccounting)this.getApplication()).setAdminFlag(true);
+    public void processFinish(String output, String typeFinishedProc) {
+        if(typeFinishedProc.equals("login")){
+            if(output.equals("Login success")){
+                if(!(etPassword.getText().toString().equals("")))
+                {
+                    ((GlobalInventoryaccounting)this.getApplication()).setAdminFlag(true);
+                }
+                else {
+                    ((GlobalInventoryaccounting)this.getApplication()).setAdminFlag(false);
+                }
+                Intent intent = new Intent(".MainMenuActivity");
+                //intent.putExtra("NAME", Value); in new act in onCreate() {.... variable = getIntent().getExtras().getString("NAME")}
+                startActivity(intent);
             }
-            else {
-                ((GlobalInventoryaccounting)this.getApplication()).setAdminFlag(false);
-            }
-            Intent intent = new Intent(".MainMenuActivity");
-            //intent.putExtra("NAME", Value); in new act in onCreate() {.... variable = getIntent().getExtras().getString("NAME")}
-            startActivity(intent);
         }
     }
 }

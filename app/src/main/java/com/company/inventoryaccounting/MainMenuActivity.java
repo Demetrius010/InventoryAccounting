@@ -13,7 +13,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class MainMenuActivity extends AppCompatActivity implements BackgroundWorkerResponse {
 
@@ -21,6 +24,16 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
     Spinner spnAddress;
     JSONObject jsonObject;
     JSONArray jsonArray;
+    Map<String, String> allAddresses;
+
+    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+        for (Map.Entry<T, E> entry : map.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,28 +69,81 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
     }
 
     public void onAllEquipButton(View view){
-
+        String type = "getAllEquip";
+        String selectedAddressId = getKeyByValue(allAddresses, spnAddress.getSelectedItem().toString());
+        //Log.d("Value", "selectedAddressId = " + selectedAddressId);
+        new BackgroundWorker(this, this).execute(type, selectedAddressId);
     }
+
+
+    public void onBrokenEquipButton(View view){
+        String type = "getBrokenEquip";
+        String selectedAddressId = getKeyByValue(allAddresses, spnAddress.getSelectedItem().toString());
+        new BackgroundWorker(this, this).execute(type, selectedAddressId);
+    }
+
+    public void onEquipUnderRepairButton(View view){
+        String type = "getEquipUnderRepair";
+        String selectedAddressId = getKeyByValue(allAddresses, spnAddress.getSelectedItem().toString());
+        new BackgroundWorker(this, this).execute(type, selectedAddressId);
+    }
+
+    public void onAddNewPlaceButton(View view){
+        String type = "getAddNewPlaceButton";
+        new BackgroundWorker(this, this).execute(type);
+    }
+
+    public void onAddNewEquipButton(View view){
+        String type = "getAddNewEquipButton";
+        new BackgroundWorker(this, this).execute(type);
+    }
+
+
 
     @Override
-    public void processFinish(String output) {
-
-        try {
-            String address;
-            List<String> allAddresses = new ArrayList<String>();
-            jsonObject = new JSONObject(output);
-            jsonArray = jsonObject.getJSONArray("server_response");
-            for(int i = 0; i < jsonArray.length(); i++){
-                JSONObject jsonObj = jsonArray.getJSONObject(i);
-                address = jsonObj.getString("short_address");
-                allAddresses.add(address);
-                //Log.d("Value","address =" + address);
+    public void processFinish(String output, String typeFinishedProc) {
+        if(typeFinishedProc.equals("getAddresses"))
+        {
+            try {
+                String addressId, address;
+                //List<String> allAddresses = new ArrayList<String>();
+                allAddresses = new HashMap<String, String>();//map.put("dog", "type of animal");//System.out.println(map.get("dog"));
+                jsonObject = new JSONObject(output);
+                jsonArray = jsonObject.getJSONArray("server_response");
+                for(int i = 0; i < jsonArray.length(); i++){
+                    JSONObject jsonObj = jsonArray.getJSONObject(i);
+                    address = jsonObj.getString("short_address");
+                    //allAddresses.add(address);
+                    addressId = jsonObj.getString("id");
+                    allAddresses.put(addressId, address);
+                    //Log.d("Value", "addressId = " + addressId + " address = " + allAddresses.get(addressId));
+                }
+                //ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allAddresses);
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new ArrayList<String>(allAddresses.values()));
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spnAddress.setAdapter(dataAdapter);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allAddresses);
-            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spnAddress.setAdapter(dataAdapter);
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
+        else if (typeFinishedProc.equals("getAllEquip"))
+            try {
+                String name, inventory_num, category, responsible, space, equip_condition;
+                jsonObject = new JSONObject(output);
+                jsonArray = jsonObject.getJSONArray("server_response");
+                for(int i = 0; i < jsonArray.length(); i++){
+                    JSONObject jsonObj = jsonArray.getJSONObject(i);
+                    name = jsonObj.getString("name");
+                    inventory_num = jsonObj.getString("inventory_num");
+                    category = jsonObj.getString("category");
+                    responsible = jsonObj.getString("responsible");
+                    space = jsonObj.getString("space");
+                    equip_condition = jsonObj.getString("equip_condition");
+                    Log.d("Values","name = " + name + " inventoryNum = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
     }
+
 }

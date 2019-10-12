@@ -1,5 +1,5 @@
 package com.company.inventoryaccounting;
 
 public interface BackgroundWorkerResponse {
-    void processFinish(String output);
+    void processFinish(String output, String nameFinishedProc);
 }

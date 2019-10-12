@@ -46,6 +46,7 @@
 
     <Button
         android:id="@+id/btnBrokenEquip"
+        android:onClick="onBrokenEquipButton"
         android:layout_width="250dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
@@ -60,6 +61,7 @@
 
     <Button
         android:id="@+id/btnEquipUnderRepair"
+        android:onClick="onEquipUnderRepairButton"
         android:layout_width="250dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
@@ -74,6 +76,7 @@
 
     <Button
         android:id="@+id/bntAddNewPlace"
+        android:onClick="onAddNewPlaceButton"
         android:layout_width="250dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
@@ -89,6 +92,7 @@
 
     <Button
         android:id="@+id/btnAddNewEquip"
+        android:onClick="onAddNewEquipButton"
         android:layout_width="250dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
