@@ -1,5 +1,6 @@
 package com.company.inventoryaccounting;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -126,12 +127,12 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
                 e.printStackTrace();
             }
         }
-        else if (typeFinishedProc.equals("getAllEquip"))
+        else if (typeFinishedProc.equals("getAllEquip")) {
             try {
                 String name, inventory_num, category, responsible, space, equip_condition;
                 jsonObject = new JSONObject(output);
                 jsonArray = jsonObject.getJSONArray("server_response");
-                for(int i = 0; i < jsonArray.length(); i++){
+                for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObj = jsonArray.getJSONObject(i);
                     name = jsonObj.getString("name");
                     inventory_num = jsonObj.getString("inventory_num");
@@ -139,11 +140,55 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
                     responsible = jsonObj.getString("responsible");
                     space = jsonObj.getString("space");
                     equip_condition = jsonObj.getString("equip_condition");
-                    Log.d("Values","name = " + name + " inventoryNum = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
+                    //Log.d("Values", "getAllEquip name = " + name + " inventoryNum = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
+                }
+                Intent intent = new Intent(".ToolListActivity");
+                intent.putExtra("jsonArray", jsonArray.toString()); //in new act in onCreate() {.... variable = getIntent().getExtras().getString("NAME")}
+                startActivity(intent);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (typeFinishedProc.equals("getBrokenEquip")) {
+            try {
+
+                String name, inventory_num, category, responsible, space, equip_condition;
+                jsonObject = new JSONObject(output);
+                jsonArray = jsonObject.getJSONArray("server_response");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObj = jsonArray.getJSONObject(i);
+                    name = jsonObj.getString("name");
+                    inventory_num = jsonObj.getString("inventory_num");
+                    category = jsonObj.getString("category");
+                    responsible = jsonObj.getString("responsible");
+                    space = jsonObj.getString("space");
+                    equip_condition = jsonObj.getString("equip_condition");
+                    Log.d("Values", "getBrokenEquip name = " + name + " inventoryNum = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+        else if (typeFinishedProc.equals("getEquipUnderRepair")) {
+            try {
+
+                String name, inventory_num, category, responsible, space, equip_condition;
+                jsonObject = new JSONObject(output);
+                jsonArray = jsonObject.getJSONArray("server_response");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObj = jsonArray.getJSONObject(i);
+                    name = jsonObj.getString("name");
+                    inventory_num = jsonObj.getString("inventory_num");
+                    category = jsonObj.getString("category");
+                    responsible = jsonObj.getString("responsible");
+                    space = jsonObj.getString("space");
+                    equip_condition = jsonObj.getString("equip_condition");
+                    Log.d("Values", "getEquipUnderRepair name = " + name + " inventoryNum = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
