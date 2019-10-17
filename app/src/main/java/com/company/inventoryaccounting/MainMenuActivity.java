@@ -69,24 +69,28 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
         new BackgroundWorker(this, this).execute(type);
     }
 
-    public void onAllEquipButton(View view){
-        String type = "getAllEquip";
+    private void getEquip(String equipCond)
+    {
+        String type = "getEquip";
         String selectedAddressId = getKeyByValue(allAddresses, spnAddress.getSelectedItem().toString());
         //Log.d("Value", "selectedAddressId = " + selectedAddressId);
-        new BackgroundWorker(this, this).execute(type, selectedAddressId);
+        new BackgroundWorker(this, this).execute(type, selectedAddressId, equipCond);
+    }
+
+    public void onAllEquipButton(View view){
+        String condition = "Работает";
+        getEquip(condition);
     }
 
 
     public void onBrokenEquipButton(View view){
-        String type = "getBrokenEquip";
-        String selectedAddressId = getKeyByValue(allAddresses, spnAddress.getSelectedItem().toString());
-        new BackgroundWorker(this, this).execute(type, selectedAddressId);
+        String condition = "Сломан";
+        getEquip(condition);
     }
 
     public void onEquipUnderRepairButton(View view){
-        String type = "getEquipUnderRepair";
-        String selectedAddressId = getKeyByValue(allAddresses, spnAddress.getSelectedItem().toString());
-        new BackgroundWorker(this, this).execute(type, selectedAddressId);
+        String condition = "В ремонте";
+        getEquip(condition);
     }
 
     public void onAddNewPlaceButton(View view){
@@ -127,20 +131,21 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
                 e.printStackTrace();
             }
         }
-        else if (typeFinishedProc.equals("getAllEquip")) {
+        else if (typeFinishedProc.equals("getEquip")) {
             try {
-                String name, inventory_num, category, responsible, space, equip_condition;
+                String id, name, inventory_num, category, responsible, space, equip_condition;
                 jsonObject = new JSONObject(output);
                 jsonArray = jsonObject.getJSONArray("server_response");
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObj = jsonArray.getJSONObject(i);
+                    id =  jsonObj.getString("id");
                     name = jsonObj.getString("name");
                     inventory_num = jsonObj.getString("inventory_num");
                     category = jsonObj.getString("category");
                     responsible = jsonObj.getString("responsible");
                     space = jsonObj.getString("space");
                     equip_condition = jsonObj.getString("equip_condition");
-                    //Log.d("Values", "getAllEquip name = " + name + " inventoryNum = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
+                    Log.d("Values", "getAllEquip id =" + id + " name = " + name + " inventoryNum = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
                 }
                 Intent intent = new Intent(".ToolListActivity");
                 intent.putExtra("jsonArray", jsonArray.toString()); //in new act in onCreate() {.... variable = getIntent().getExtras().getString("NAME")}
@@ -149,7 +154,7 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
                 e.printStackTrace();
             }
         }
-        else if (typeFinishedProc.equals("getBrokenEquip")) {
+        /*else if (typeFinishedProc.equals("getBrokenEquip")) {
             try {
 
                 String name, inventory_num, category, responsible, space, equip_condition;
@@ -188,7 +193,7 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
 }

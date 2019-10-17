@@ -21,16 +21,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainMenuActivity">
+        <activity
+            android:name=".MainMenuActivity"
+            android:label="Учёт инвентаря">
             <intent-filter>
                 <action android:name=".MainMenuActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ToolListActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity
+            android:name=".ToolListActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name=".ToolListActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ChangeInstrument"
+            android:label="Учёт инвентаря">
+            <intent-filter>
+                <action android:name=".ChangeInstrument" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

@@ -38,9 +38,10 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
         String login_url = "http://192.168.1.2:8080/login.php";//"http://37.20.16.44:8080/login.php";
         //String register_url = "http://37.20.16.44:8080/register.php";
         String addresses_url = "http://192.168.1.2:8080/getAddresses.php";
-        String allEquip_url = "http://192.168.1.2:8080/getAllEquip.php";
-        String brokenEquip_url = "http://192.168.1.2:8080/getBrokenEquip.php";
-        String equipUnderRepair_url = "http://192.168.1.2:8080/getEquipUnderRepair.php";
+        String equip_url = "http://192.168.1.2:8080/getEquip.php";
+        //String brokenEquip_url = "http://192.168.1.2:8080/getBrokenEquip.php";
+        //String equipUnderRepair_url = "http://192.168.1.2:8080/getEquipUnderRepair.php";
+        String responsible_url = "http://192.168.1.2:8080/getResponsible.php";
         if(type.equals("login")){
             try {
                 String phone = params[1];
@@ -98,11 +99,12 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 e.printStackTrace();
             }
         }
-        else if(type.equals("getAllEquip")){
+        else if(type.equals("getEquip")){
             try {
                 String address = params[1];
+                String equipCondition = params[2];
                 String jsonString;
-                URL url = new URL(allEquip_url);
+                URL url = new URL(equip_url);
                 HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -110,7 +112,8 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 httpURLConnection.setDoInput(true);
                 OutputStream outputStream = httpURLConnection.getOutputStream();
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-                String post_data = URLEncoder.encode("space", "UTF-8") + "=" + URLEncoder.encode(address, "UTF-8");//address
+                String post_data = URLEncoder.encode("space", "UTF-8") + "=" + URLEncoder.encode(address, "UTF-8")+ "&"
+                        + URLEncoder.encode("condition", "UTF-8") + "=" + URLEncoder.encode(equipCondition, "UTF-8");
                 bufferedWriter.write(post_data);
                 bufferedWriter.flush();
                 bufferedWriter.close();
@@ -122,7 +125,6 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 while ((jsonString = bufferedReader.readLine())!= null)
                 {
                     stringBuilder.append(jsonString+"\n");
-
                 }
                 bufferedReader.close();
                 inputStream.close();
@@ -134,7 +136,30 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 e.printStackTrace();
             }
         }
-        else if(type.equals("getBrokenEquip")){
+        else if(type.equals("getResponsible")) {
+            try {
+                String jsonString;
+                URL url = new URL(responsible_url);
+                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((jsonString = bufferedReader.readLine())!= null)
+                {
+                    stringBuilder.append(jsonString+"\n");
+
+                }
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return stringBuilder.toString();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        /*else if(type.equals("getBrokenEquip")){
             try {
                 String address = params[1];
                 String jsonString;
