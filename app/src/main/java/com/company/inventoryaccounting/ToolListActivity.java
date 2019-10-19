@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ToolListActivity extends AppCompatActivity implements BackgroundWorkerResponse  {
+public class ToolListActivity extends AppCompatActivity implements BackgroundWorkerResponse {
     String jsonString;
     Spinner spnCategory;
     Map<String, String> allResponsible;
@@ -151,6 +151,7 @@ public class ToolListActivity extends AppCompatActivity implements BackgroundWor
     public void processFinish(String output, String typeFinishedProc) {
         if(typeFinishedProc.equals("getResponsible"))
         {
+            ((GlobalInventoryaccounting)this.getApplication()).setResponsibleData(output);
             try {
                 String reponsibleId, responsibleFullName;
                 allResponsible = new HashMap<String, String>();//map.put("dog", "type of animal");//System.out.println(map.get("dog"));

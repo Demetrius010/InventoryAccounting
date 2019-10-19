@@ -54,7 +54,7 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
     private void ifAdmin(){
         if (((GlobalInventoryaccounting) this.getApplication()).isAdmin())
         {
-            Log.d("Value","admin = " + ((GlobalInventoryaccounting) this.getApplication()).isAdmin());
+            //Log.d("Value","admin = " + ((GlobalInventoryaccounting) this.getApplication()).isAdmin());
             bntAddNewPlace.setVisibility(View.VISIBLE);
             btnAddNewEquip.setVisibility(View.VISIBLE);
         }
@@ -109,6 +109,7 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
     public void processFinish(String output, String typeFinishedProc) {
         if(typeFinishedProc.equals("getAddresses"))
         {
+            ((GlobalInventoryaccounting)this.getApplication()).setAddressesData(output);
             try {
                 String addressId, address;
                 //List<String> allAddresses = new ArrayList<String>();
@@ -145,7 +146,7 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
                     responsible = jsonObj.getString("responsible");
                     space = jsonObj.getString("space");
                     equip_condition = jsonObj.getString("equip_condition");
-                    Log.d("Values", "getAllEquip id =" + id + " name = " + name + " inventoryNum = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
+                    //Log.d("Values", "getAllEquip id =" + id + " name = " + name + " inventoryNum = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
                 }
                 Intent intent = new Intent(".ToolListActivity");
                 intent.putExtra("jsonArray", jsonArray.toString()); //in new act in onCreate() {.... variable = getIntent().getExtras().getString("NAME")}
