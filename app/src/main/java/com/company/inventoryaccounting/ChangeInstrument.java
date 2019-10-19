@@ -1,5 +1,6 @@
 package com.company.inventoryaccounting;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,15 +19,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ChangeInstrument extends AppCompatActivity implements BackgroundWorkerResponse {
     String instrumentId;
     String responsibleData;
     String addressesData;
-    String equipId;
 
     EditText etEquipName, etEquipInventoryNum;
-    Spinner spinCategory, spinPlace, spinCondition, spinResponsible;
+    Spinner spinPlace, spinCondition, spinResponsible;
 
     ArrayAdapter<String> dataAdapterForConditions;
     Map<String, String> allResponsible;
@@ -42,7 +44,6 @@ public class ChangeInstrument extends AppCompatActivity implements BackgroundWor
         //Log.d("Value", "instrumentId = " + instrumentId);
         etEquipName = (EditText) findViewById(R.id.etEquipName);
         etEquipInventoryNum = (EditText) findViewById(R.id.etEquipInventoryNum);
-        spinCategory= (Spinner)findViewById(R.id.spinCategory);
         spinPlace = (Spinner)findViewById(R.id.spinPlace);
         spinCondition = (Spinner)findViewById(R.id.spinCondition);
         spinResponsible = (Spinner)findViewById(R.id.spinResponsible);
@@ -111,14 +112,17 @@ public class ChangeInstrument extends AppCompatActivity implements BackgroundWor
 
     public void onSave(View view){
         String type = "saveEquip";
-        new BackgroundWorker(this, this).execute(type);
+        //Log.d("Value", " type = " + type + " instrumentId = " + instrumentId + " etEquipName = " + etEquipName.getText().toString() + " etEquipInventoryNum = " + etEquipInventoryNum.getText().toString() + " spinResponsible = " + getKeyByValue(allResponsible, spinResponsible.getSelectedItem().toString()) + " spinPlace = " +  getKeyByValue(allAddresses, spinPlace.getSelectedItem().toString()) + " spinCondition = " + spinCondition.getSelectedItem().toString());
+        new BackgroundWorker(this, this).execute(type, instrumentId, etEquipName.getText().toString(),
+                etEquipInventoryNum.getText().toString(), getKeyByValue(allResponsible, spinResponsible.getSelectedItem().toString()),
+                getKeyByValue(allAddresses, spinPlace.getSelectedItem().toString()), spinCondition.getSelectedItem().toString());
     }
 
     @Override
     public void processFinish(String output, String typeFinishedProc) {
         if (typeFinishedProc.equals("getEquipByID")) {
             try {
-                String name, inventory_num, category, responsible, space, equip_condition;
+                String name, inventory_num, responsible, space, equip_condition;
                 JSONObject jsonObject = new JSONObject(output);
                 JSONArray jsonArray = jsonObject.getJSONArray("server_response");
                 jsonObject = jsonArray.getJSONObject(0);
@@ -145,13 +149,29 @@ public class ChangeInstrument extends AppCompatActivity implements BackgroundWor
                     etEquipName.setEnabled(false);
                     etEquipInventoryNum.setEnabled(false);
                 }
-                //id =  jsonObj.getString("id"); category = jsonObject.getString("category"); responsible = jsonObj.getString("responsible");//space = jsonObj.getString("space");//
+                //category = jsonObject.getString("category"); responsible = jsonObj.getString("responsible");//space = jsonObj.getString("space");//
                 //Log.d("Values", "getAllEquip id =" + id + " name = " + name + " inventoryNum = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+        if (typeFinishedProc.equals("saveEquip")) {
+            if(output.equals("Update successful")) {
+                Toast.makeText(this, "Изменения сохранены", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(".MainMenuActivity");
+                startActivity(intent);
+            }
+        }
+    }
+
+    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+        for (Map.Entry<T, E> entry : map.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 }
 

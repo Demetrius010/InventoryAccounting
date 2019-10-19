@@ -46,6 +46,7 @@ public class ToolListActivity extends AppCompatActivity implements BackgroundWor
 
         jsonString = getIntent().getExtras().getString("jsonArray");
         spnCategory = (Spinner)findViewById(R.id.spnCategory);
+        spnCategory.setAdapter(null);
         spnCategory.setOnItemSelectedListener(listener);
         getCategories();
 

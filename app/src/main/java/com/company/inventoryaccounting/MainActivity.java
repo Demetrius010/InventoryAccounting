@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements BackgroundWorkerResponse {
 
@@ -124,6 +125,9 @@ public class MainActivity extends AppCompatActivity implements BackgroundWorkerR
                 Intent intent = new Intent(".MainMenuActivity");
                 //intent.putExtra("NAME", Value); in new act in onCreate() {.... variable = getIntent().getExtras().getString("NAME")}
                 startActivity(intent);
+            }
+            else if(output.equals("Login failed")){
+                Toast.makeText(this, "Не удалось войти", Toast.LENGTH_LONG).show();
             }
         }
     }
