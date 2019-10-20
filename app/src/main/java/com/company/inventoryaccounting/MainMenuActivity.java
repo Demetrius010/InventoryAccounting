@@ -121,7 +121,7 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
                     //allAddresses.add(address);
                     addressId = jsonObj.getString("id");
                     allAddresses.put(addressId, address);
-                    Log.d("Value", "addressId = " + addressId + " address = " + allAddresses.get(addressId));
+                    //Log.d("Value", "addressId = " + addressId + " address = " + allAddresses.get(addressId));
                 }
                 //ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allAddresses);
                 ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new ArrayList<String>(allAddresses.values()));
@@ -154,46 +154,6 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
                 e.printStackTrace();
             }
         }
-        /*else if (typeFinishedProc.equals("getBrokenEquip")) {
-            try {
-
-                String name, inventory_num, category, responsible, space, equip_condition;
-                jsonObject = new JSONObject(output);
-                jsonArray = jsonObject.getJSONArray("server_response");
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonObj = jsonArray.getJSONObject(i);
-                    name = jsonObj.getString("name");
-                    inventory_num = jsonObj.getString("inventory_num");
-                    category = jsonObj.getString("category");
-                    responsible = jsonObj.getString("responsible");
-                    space = jsonObj.getString("space");
-                    equip_condition = jsonObj.getString("equip_condition");
-                    Log.d("Values", "getBrokenEquip name = " + name + " inventoryNum = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        else if (typeFinishedProc.equals("getEquipUnderRepair")) {
-            try {
-
-                String name, inventory_num, category, responsible, space, equip_condition;
-                jsonObject = new JSONObject(output);
-                jsonArray = jsonObject.getJSONArray("server_response");
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonObj = jsonArray.getJSONObject(i);
-                    name = jsonObj.getString("name");
-                    inventory_num = jsonObj.getString("inventory_num");
-                    category = jsonObj.getString("category");
-                    responsible = jsonObj.getString("responsible");
-                    space = jsonObj.getString("space");
-                    equip_condition = jsonObj.getString("equip_condition");
-                    Log.d("Values", "getEquipUnderRepair name = " + name + " inventoryNum = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }*/
     }
 
 }
