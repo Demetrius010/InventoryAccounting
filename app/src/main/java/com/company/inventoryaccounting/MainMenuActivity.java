@@ -15,13 +15,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class MainMenuActivity extends AppCompatActivity implements BackgroundWorkerResponse {
 
-    Button btnAllEquip, btnBrokenEquip, btnEquipUnderRepair, bntAddNewPlace, btnAddNewEquip;
+    Button btnAllEquip, btnBrokenEquip, btnEquipUnderRepair, bntObjects, btnInventory;
     Spinner spnAddress;
     JSONObject jsonObject;
     JSONArray jsonArray;
@@ -43,8 +42,8 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
         btnAllEquip = (Button)findViewById(R.id.btnAllEquip);
         btnBrokenEquip = (Button)findViewById(R.id.btnBrokenEquip);
         btnEquipUnderRepair = (Button)findViewById(R.id.btnEquipUnderRepair);
-        bntAddNewPlace = (Button)findViewById(R.id.bntAddNewPlace);
-        btnAddNewEquip = (Button)findViewById(R.id.btnAddNewEquip);
+        bntObjects = (Button)findViewById(R.id.bntObjects);
+        btnInventory = (Button)findViewById(R.id.btnInventory);
         spnAddress = (Spinner)findViewById(R.id.spnAddress);
 
         ifAdmin();
@@ -55,12 +54,12 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
         if (((GlobalInventoryaccounting) this.getApplication()).isAdmin())
         {
             //Log.d("Value","admin = " + ((GlobalInventoryaccounting) this.getApplication()).isAdmin());
-            bntAddNewPlace.setVisibility(View.VISIBLE);
-            btnAddNewEquip.setVisibility(View.VISIBLE);
+            bntObjects.setVisibility(View.VISIBLE);
+            btnInventory.setVisibility(View.VISIBLE);
         }
         else{
-            bntAddNewPlace.setVisibility(View.INVISIBLE);
-            btnAddNewEquip.setVisibility(View.INVISIBLE);
+            bntObjects.setVisibility(View.INVISIBLE);
+            btnInventory.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -93,14 +92,14 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
         getEquip(condition);
     }
 
-    public void onAddNewPlaceButton(View view){
-        String type = "getAddNewPlaceButton";
-        new BackgroundWorker(this, this).execute(type);
+    public void onObjectsButton(View view){
+        Intent intent = new Intent(".ChangePlaceActivity");
+        startActivity(intent);
     }
 
-    public void onAddNewEquipButton(View view){
-        String type = "getAddNewEquipButton";
-        new BackgroundWorker(this, this).execute(type);
+    public void onInventoryButton(View view){
+        //String type = "getAddNewEquipButton";
+        //new BackgroundWorker(this, this).execute(type);
     }
 
 
@@ -122,7 +121,7 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
                     //allAddresses.add(address);
                     addressId = jsonObj.getString("id");
                     allAddresses.put(addressId, address);
-                    //Log.d("Value", "addressId = " + addressId + " address = " + allAddresses.get(addressId));
+                    Log.d("Value", "addressId = " + addressId + " address = " + allAddresses.get(addressId));
                 }
                 //ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allAddresses);
                 ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new ArrayList<String>(allAddresses.values()));

@@ -39,10 +39,9 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
         String saveEquip_url = "http://192.168.1.2:8080/saveEquip.php";
         String addresses_url = "http://192.168.1.2:8080/getAddresses.php";
         String equip_url = "http://192.168.1.2:8080/getEquip.php";
-        //String brokenEquip_url = "http://192.168.1.2:8080/getBrokenEquip.php";
-        //String equipUnderRepair_url = "http://192.168.1.2:8080/getEquipUnderRepair.php";
         String responsible_url = "http://192.168.1.2:8080/getResponsible.php";
         String equipByID_url = "http://192.168.1.2:8080/getEquipById.php";
+        String addAddress_url = "http://192.168.1.2:8080/addAddress.php";
         if(type.equals("login")){
             try {
                 String phone = params[1];
@@ -218,6 +217,41 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                         + URLEncoder.encode("responsible", "UTF-8") + "=" + URLEncoder.encode(responsible, "UTF-8") + "&"
                         + URLEncoder.encode("place", "UTF-8") + "=" + URLEncoder.encode(place, "UTF-8")+ "&"
                         + URLEncoder.encode("condition", "UTF-8") + "=" + URLEncoder.encode(condition, "UTF-8");;
+                bufferedWriter.write(post_data);
+                bufferedWriter.flush();
+                bufferedWriter.close();
+                outputStream.close();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));//,  "iso-8859-1"));
+                String result = "";
+                String line = "";
+                while ((line = bufferedReader.readLine()) != null){
+                    result += line;
+                }
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return result;
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        else if (type.equals("addNewPlace")){
+            try {
+                String shortAddress = params[1];
+                String fullAddress = params[2];
+                String jsonString;
+                URL url = new URL(addAddress_url);
+                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.setDoInput(true);
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+                String post_data = URLEncoder.encode("short_address", "UTF-8") + "=" + URLEncoder.encode(shortAddress, "UTF-8") + "&"
+                        + URLEncoder.encode("full_address", "UTF-8") + "=" + URLEncoder.encode(fullAddress, "UTF-8");
                 bufferedWriter.write(post_data);
                 bufferedWriter.flush();
                 bufferedWriter.close();

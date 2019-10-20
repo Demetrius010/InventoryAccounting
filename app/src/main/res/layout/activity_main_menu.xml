@@ -18,7 +18,7 @@
 
     <Spinner
         android:id="@+id/spnAddress"
-        android:layout_width="200dp"
+        android:layout_width="250dp"
         android:layout_height="30dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
@@ -26,7 +26,7 @@
         android:gravity="center"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.62"
+        app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
@@ -77,15 +77,15 @@
         app:layout_constraintTop_toBottomOf="@+id/btnBrokenEquip" />
 
     <Button
-        android:id="@+id/bntAddNewPlace"
-        android:onClick="onAddNewPlaceButton"
+        android:id="@+id/bntObjects"
         android:layout_width="250dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:background="@color/colorPrimary"
-        android:text="Добавить новый объект"
+        android:onClick="onObjectsButton"
+        android:text="Объекты строительства"
         android:textColor="#FFFFFF"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
@@ -93,18 +93,18 @@
         app:layout_constraintTop_toBottomOf="@+id/btnEquipUnderRepair" />
 
     <Button
-        android:id="@+id/btnAddNewEquip"
-        android:onClick="onAddNewEquipButton"
+        android:id="@+id/btnInventory"
         android:layout_width="250dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:background="@color/colorPrimary"
-        android:text="Добавить новый инструмент"
+        android:onClick="onInventoryButton"
+        android:text="Инвентарь"
         android:textColor="#FFFFFF"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bntAddNewPlace" />
+        app:layout_constraintTop_toBottomOf="@+id/bntObjects" />
 </android.support.constraint.ConstraintLayout>

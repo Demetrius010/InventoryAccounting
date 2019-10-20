@@ -48,6 +48,15 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ChangePlaceActivity"
+            android:label="Учёт инвентаря">>
+            <intent-filter>
+                <action android:name=".ChangePlaceActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
