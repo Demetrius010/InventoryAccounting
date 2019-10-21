@@ -44,6 +44,8 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
         String addAddress_url = "http://192.168.1.2:8080/addAddress.php";
         String changePlace_url = "http://192.168.1.2:8080/changePlace.php";
         String removePlace_url = "http://192.168.1.2:8080/removePlace.php";
+        String getAllEquip_url = "http://192.168.1.2:8080/getAllEquip.php";
+        String addNewInventory_url = "http://192.168.1.2:8080/addNewInventory.php";
         if(type.equals("login")){
             try {
                 String phone = params[1];
@@ -340,6 +342,64 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
             } catch (IOException e){
                 e.printStackTrace();
             }
+        }
+        else if(type.equals("getAllEquip")){
+            try {
+                String jsonString;
+                URL url = new URL(getAllEquip_url);
+                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((jsonString = bufferedReader.readLine())!= null)
+                {
+                    stringBuilder.append(jsonString+"\n");
+                }
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return stringBuilder.toString().trim();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        else if (type.equals("addNewInventory")){
+           /* try {
+                String name = params[1];
+                String inventory_num = params[2];
+                String category = params[3];
+                String condition = params[4];
+                URL url = new URL(addNewInventory_url);
+                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.setDoInput(true);
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+                String post_data = URLEncoder.encode("short_address", "UTF-8") + "=" + URLEncoder.encode(shortAddress, "UTF-8") + "&"
+                        + URLEncoder.encode("full_address", "UTF-8") + "=" + URLEncoder.encode(fullAddress, "UTF-8");
+                bufferedWriter.write(post_data);
+                bufferedWriter.flush();
+                bufferedWriter.close();
+                outputStream.close();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));//,  "iso-8859-1"));
+                String result = "";
+                String line = "";
+                while ((line = bufferedReader.readLine()) != null){
+                    result += line;
+                }
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return result;
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }*/
         }
         return null;
     }

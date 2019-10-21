@@ -29,7 +29,7 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
     Spinner spnId;
     AutoCompleteTextView actvDesc, actvFullAddress;
     String addressesData;
-    Map<String, String> allShortAddresses;
+    Map<String, String> allShortAddresses, allFullAddresses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +67,11 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
                     btnChangePlace.getBackground().setAlpha(255);
                     btnRemovePlace.setEnabled(true);
                     btnRemovePlace.getBackground().setAlpha(255);
+                    String currentKey = getKeyByValue(allShortAddresses, spnId.getSelectedItem().toString());
+                    actvDesc.setText(allShortAddresses.get(currentKey));
+                    actvDesc.setSelection(actvDesc.getText().length());
+                    actvFullAddress.setText(allFullAddresses.get(currentKey));
+                    actvFullAddress.setSelection(actvFullAddress.getText().length());
                 }
             }
 
@@ -79,9 +84,8 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
     public void fillActvDesc() {
         try {
             String addressId, shortAddress, fullAddress;
-            allShortAddresses = new HashMap<String, String>(); // короткое описаение хранится в словаре чтобы заполнить спиннер и автотекст
-            //List<String> allShortAddresses = new ArrayList<String>();
-            List<String> allFullAddresses = new ArrayList<String>();
+            allShortAddresses = new HashMap<String, String>();
+            allFullAddresses = new HashMap<String, String>();
             JSONObject jsonObject = new JSONObject(addressesData);
             JSONArray jsonArray = jsonObject.getJSONArray("server_response");
             for(int i = 0; i < jsonArray.length(); i++){
@@ -89,9 +93,8 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
                 addressId = jsonObj.getString("id");
                 shortAddress = jsonObj.getString("short_address");
                 allShortAddresses.put(addressId, shortAddress);
-                //allShortAddresses.add(shortAddress);
                 fullAddress = jsonObj.getString("full_address");
-                allFullAddresses.add(fullAddress);
+                allFullAddresses.put(addressId, fullAddress);
 
             }
             ArrayAdapter<String> shortAddressesDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<String>(allShortAddresses.values()));
@@ -99,10 +102,10 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
 
             ArrayAdapter<String> shortAddressesSpinDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new ArrayList<String>(allShortAddresses.values()));
             shortAddressesSpinDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            shortAddressesSpinDataAdapter.add("Новый объект");
+            shortAddressesSpinDataAdapter.insert("Новый объект", 0);
             spnId.setAdapter(shortAddressesSpinDataAdapter);
 
-            ArrayAdapter<String> fullAddressesDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, allFullAddresses);
+            ArrayAdapter<String> fullAddressesDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<String>(allFullAddresses.values()));
             actvFullAddress.setAdapter(fullAddressesDataAdapter);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -157,7 +160,6 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
                 TextView textView = (TextView) toast.getView().findViewById(android.R.id.message);
                 if( textView != null) textView.setGravity(Gravity.CENTER);
                 toast.show();
-                //Log.d("value", "output = " + output);
             }
         }
     }

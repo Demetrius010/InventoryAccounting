@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -98,8 +99,8 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
     }
 
     public void onInventoryButton(View view){
-        //String type = "getAddNewEquipButton";
-        //new BackgroundWorker(this, this).execute(type);
+        Intent intent = new Intent(".ChangeInventoryActivity");
+        startActivity(intent);
     }
 
 
@@ -136,6 +137,11 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
                 String id, name, inventory_num, category, responsible, space, equip_condition;
                 jsonObject = new JSONObject(output);
                 jsonArray = jsonObject.getJSONArray("server_response");
+                if (jsonArray.length() == 0)
+                {
+                    Toast.makeText(this, "Инвентарь отсутствует", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObj = jsonArray.getJSONObject(i);
                     id =  jsonObj.getString("id");
