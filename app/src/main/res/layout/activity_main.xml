@@ -21,7 +21,7 @@
         android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:cursorVisible="false"
         android:ems="10"
@@ -29,7 +29,9 @@
         android:inputType="phone"
         android:lines="1"
         android:maxLength="17"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
@@ -44,6 +46,7 @@
         android:onClick="onLogin"
         android:text="Войти"
         android:textColor="#FFFFFF"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etPassword" />
@@ -55,12 +58,13 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:ems="10"
         android:cursorVisible="false"
-        android:hint="admin only"
         android:ellipsize="start"
+        android:ems="10"
         android:gravity="center_horizontal"
+        android:hint="Пароль"
         android:inputType="textPassword"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etPhone" />

@@ -32,8 +32,11 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
     Map<String, String> allEquipmentsName, allInvNum, allInvCategory, allInvCondition, allInvResponsible, allInvAddresses;
     Map<String, String> allConditions, allResponsible, allAddresses;
 
+    ArrayAdapter<String> responsibleDataAdapter, addressesDataAdapter;
+
     String responsibleData;
     String addressesData;
+    String currentID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,19 +66,23 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
     public void onAddInventoryBtn(View view)
     {
         String type = "addNewInventory";
-        new BackgroundWorker(this, this).execute(type, actvName.getText().toString(), actvInvNum.getText().toString(), actvInvCategory.getText().toString(), spnCondition.getSelectedItem().toString());
+        new BackgroundWorker(this, this).execute(type, actvName.getText().toString(), actvInvNum.getText().toString(),
+                actvInvCategory.getText().toString(), getKeyByValue(allResponsible, spnInvResponsible.getSelectedItem().toString()),
+                getKeyByValue(allAddresses, spnInvPlace.getSelectedItem().toString()), spnCondition.getSelectedItem().toString());
     }
 
     public void onChangeInventoryBtn(View view)
     {
-        //String type = "changeInventory";
-        //new BackgroundWorker(this, this).execute(type, getKeyByValue(allShortAddresses, spnId.getSelectedItem().toString()), actvDesc.getText().toString(), actvFullAddress.getText().toString());
+        String type = "saveInventory";
+        new BackgroundWorker(this, this).execute(type, currentID, actvName.getText().toString(), actvInvNum.getText().toString(),
+                actvInvCategory.getText().toString(), getKeyByValue(allResponsible, spnInvResponsible.getSelectedItem().toString()),
+                getKeyByValue(allAddresses, spnInvPlace.getSelectedItem().toString()), spnCondition.getSelectedItem().toString());
     }
 
     public void onRemoveInventoryBtn(View view)
     {
-        //String type = "removePlace";
-        //new BackgroundWorker(this, this).execute(type, getKeyByValue(allShortAddresses, spnId.getSelectedItem().toString()));
+        String type = "removeInventory";
+        new BackgroundWorker(this, this).execute(type, currentID);
     }
 
     public void ifNewEquipSelected(){
@@ -98,16 +105,16 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
                     btnChangeInventory.getBackground().setAlpha(255);
                     btnRemoveInventory.setEnabled(true);
                     btnRemoveInventory.getBackground().setAlpha(255);
-                    String currentKey = getKeyByValue(allEquipmentsName, spnInventoryId.getSelectedItem().toString());
-                    actvName.setText(allEquipmentsName.get(currentKey));
+                    currentID = getKeyByValue(allEquipmentsName, spnInventoryId.getSelectedItem().toString());
+                    actvName.setText(allEquipmentsName.get(currentID));
                     actvName.setSelection(actvName.getText().length());
-                    actvInvNum.setText(allInvNum.get(currentKey));
+                    actvInvNum.setText(allInvNum.get(currentID));
                     actvInvNum.setSelection(actvInvNum.getText().length());
-                    actvInvCategory.setText(allInvCategory.get(currentKey));
+                    actvInvCategory.setText(allInvCategory.get(currentID));
                     actvInvCategory.setSelection(actvInvCategory.getText().length());
-                    spnCondition.setSelection(Integer.parseInt(getKeyByValue(allConditions, allInvCondition.get(currentKey))));
-                    //spnInvResponsible.setSelection(Integer.parseInt(getKeyByValue(allResponsible, allInvResponsible.get(currentKey))));
-                    //spnInvPlace.setSelection(Integer.parseInt(getKeyByValue(allAddresses, allInvAddresses.get(currentKey))));
+                    spnCondition.setSelection(Integer.parseInt(getKeyByValue(allConditions, allInvCondition.get(currentID))));
+                    spnInvResponsible.setSelection(responsibleDataAdapter.getPosition(allResponsible.get(allInvResponsible.get(currentID))));
+                    spnInvPlace.setSelection(addressesDataAdapter.getPosition(allAddresses.get(allInvAddresses.get(currentID))));
                 }
 
             }
@@ -147,7 +154,7 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
                     responsibleId = jsonObj.getString("id");
                     allResponsible.put(responsibleId, responsibleFullName);
                 }
-                ArrayAdapter<String> responsibleDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new ArrayList<String>(allResponsible.values()));
+                responsibleDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new ArrayList<String>(allResponsible.values()));
                 responsibleDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spnInvResponsible.setAdapter(responsibleDataAdapter);
 
@@ -167,10 +174,9 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
                 JSONObject jsonObj = jsonArray.getJSONObject(i);
                 fullAddress = jsonObj.getString("full_address");
                 addressId = jsonObj.getString("id");
-                //Log.d("Value", "addressId = " + addressId + "fullAddress = " + fullAddress);
                 allAddresses.put(addressId, fullAddress);
             }
-            ArrayAdapter<String> addressesDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new ArrayList<String>(allAddresses.values()));
+            addressesDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new ArrayList<String>(allAddresses.values()));
             addressesDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spnInvPlace.setAdapter(addressesDataAdapter);
 
@@ -243,29 +249,22 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
                 startActivity(intent);
             }
         }
-        if(typeFinishedProc.equals("changeInventory"))
+        if(typeFinishedProc.equals("saveInventory"))
         {
             if(output.equals("Update successful")) {
-                Toast.makeText(this, "Объект изменен", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Инвентарь изменен", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(".MainMenuActivity");
                 startActivity(intent);
             }
         }
-        /*if(typeFinishedProc.equals("removeInventory"))
+        if(typeFinishedProc.equals("removeInventory"))
         {
             if(output.equals("Update successful")) {
-                Toast.makeText(this, "Объект удален", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Инвентарь удален", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(".MainMenuActivity");
                 startActivity(intent);
             }
-            else {
-                Toast toast = Toast.makeText(this, "На данном объекте находится инвентарь!", Toast.LENGTH_LONG);
-                TextView textView = (TextView) toast.getView().findViewById(android.R.id.message);
-                if( textView != null) textView.setGravity(Gravity.CENTER);
-                toast.show();
-                //Log.d("value", "output = " + output);
-            }
-        }*/
+        }
     }
 
     public static <T, E> T getKeyByValue(Map<T, E> map, E value) {

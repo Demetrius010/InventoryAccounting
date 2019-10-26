@@ -44,14 +44,14 @@ public class ToolListActivity extends AppCompatActivity implements BackgroundWor
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tool_list);
 
-        jsonString = getIntent().getExtras().getString("jsonArray");
+        jsonString = getIntent().getStringExtra("jsonArray");
         spnCategory = (Spinner)findViewById(R.id.spnCategory);
         spnCategory.setAdapter(null);
         spnCategory.setOnItemSelectedListener(listener);
         getCategories();
 
-        String type = "getResponsible";
-        new BackgroundWorker(this, this).execute(type);
+       String type = "getResponsible";
+       new BackgroundWorker(this, this).execute(type);
    }
 
 

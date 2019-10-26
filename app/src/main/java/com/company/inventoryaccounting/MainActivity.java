@@ -7,20 +7,29 @@ import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.Editable;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements BackgroundWorkerResponse {
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-    EditText etPhone, etPassword;
+import java.util.HashMap;
+
+public class MainActivity extends AppCompatActivity implements BackgroundWorkerResponse {
+    Button btnLogin;
+    EditText etPhone;  //etPassword
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         etPhone = (EditText)findViewById(R.id.etPhone);
-        etPassword = (EditText)findViewById(R.id.etPassword);
+        //etPassword = (EditText)findViewById(R.id.etPassword);
+        btnLogin = (Button)findViewById(R.id.btnLogin);
 
         phoneMaskInput();
     }
@@ -49,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements BackgroundWorkerR
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
 
             @Override
@@ -105,29 +113,36 @@ public class MainActivity extends AppCompatActivity implements BackgroundWorkerR
     public void onLogin(View view){
         String type = "login";
         String phone = etPhone.getText().toString().replace("+7", "").replaceAll("[^\\d]", "");
-        String password = etPassword.getText().toString();
+        //String password = etPassword.getText().toString();
         //BackgroundWorker backgroundWorkerLogin = new BackgroundWorker(this);
         //backgroundWorkerLogin.execute(type, phone);
-        new BackgroundWorker(this, this).execute(type, phone, password);
+        new BackgroundWorker(this, this).execute(type, phone);
     }
 
     @Override
     public void processFinish(String output, String typeFinishedProc) {
         if(typeFinishedProc.equals("login")){
-            if(output.equals("Login success")){
-                if(!(etPassword.getText().toString().equals("")))
-                {
-                    ((GlobalInventoryaccounting)this.getApplication()).setAdminFlag(true);
+            try {
+                String admin = "";
+                JSONObject jsonObject = new JSONObject(output);
+                JSONArray jsonArray = jsonObject.getJSONArray("server_response");
+                if(jsonArray.length()>0){
+                    for(int i = 0; i < jsonArray.length(); i++){
+                        JSONObject jsonObj = jsonArray.getJSONObject(i);
+                        admin = jsonObj.getString("admin");
+                    }
+                    if(admin.equals("1"))
+                    {
+                        ((GlobalInventoryaccounting)this.getApplication()).setAdminFlag(true);
+                    }
+                    else {
+                        ((GlobalInventoryaccounting)this.getApplication()).setAdminFlag(false);
+                    }
+                    Intent intent = new Intent(".MainMenuActivity");
+                    startActivity(intent);
                 }
-                else {
-                    ((GlobalInventoryaccounting)this.getApplication()).setAdminFlag(false);
-                }
-                Intent intent = new Intent(".MainMenuActivity");
-                //intent.putExtra("NAME", Value); in new act in onCreate() {.... variable = getIntent().getExtras().getString("NAME")}
-                startActivity(intent);
-            }
-            else if(output.equals("Login failed")){
-                Toast.makeText(this, "Не удалось войти", Toast.LENGTH_LONG).show();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
         }
     }
