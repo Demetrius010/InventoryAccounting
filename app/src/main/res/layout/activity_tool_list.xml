@@ -6,8 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".ToolListActivity">
 
-
-    <android.support.v7.widget.Toolbar
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"/>
+    <!--<android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,28 +17,69 @@
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+<item
+    android:id="@+id/item1"
+    android:icon="@drawable/sorting"
+    android:title="Инвентарь">
+</item>
+        <!-<ImageButton
+            android:id="@+id/imgBtnFilter"
+            android:onClick="onBtnFilterClick"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end"
+            android:background="@color/colorPrimary"
+            android:scaleType="fitXY"
+            android:scaleX="0.75"
+            android:scaleY="0.75"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/filter" />
 
-        <Spinner
-            android:id="@+id/spnCategory"
-            android:layout_width="match_parent"
+        <ImageButton
+            android:id="@+id/imgBtnSort"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end"
+            android:background="@color/colorPrimary"
+            android:onClick="onImgSortBtnClick"
+            android:scaleType="fitXY"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/sorting" />
+
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="#FFFFFF"
-            android:textAlignment="center"
+            android:text="Инвентарь"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:typeface="normal"
             tools:layout_editor_absoluteX="16dp"
-            tools:layout_editor_absoluteY="16dp" />
-    </android.support.v7.widget.Toolbar>
+            tools:layout_editor_absoluteY="14dp" />
+    </android.support.v7.widget.Toolbar>-->
 
-    <LinearLayout
-        android:id="@+id/linLayout"
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <LinearLayout
+            android:id="@+id/linLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:visibility="visible"></LinearLayout>
+    </ScrollView>
+
 
 
 </android.support.constraint.ConstraintLayout>

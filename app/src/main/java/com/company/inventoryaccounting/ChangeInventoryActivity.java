@@ -137,7 +137,7 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
     }
 
     public void fillSpinResponsible() {
-        responsibleData = ((GlobalInventoryaccounting) this.getApplication()).getResponsibleData();
+        responsibleData = ((GlobalInventoryaccounting) this.getApplication()).getStaffData();
         if (responsibleData == null) {
             String type = "getResponsible";
             new BackgroundWorker(this, this).execute(type);
@@ -238,7 +238,7 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
         }
         if(typeFinishedProc.equals("getResponsible"))
         {
-            ((GlobalInventoryaccounting)this.getApplication()).setResponsibleData(output);
+            ((GlobalInventoryaccounting)this.getApplication()).setStaffData(output);
             fillSpinResponsible();
         }
         if(typeFinishedProc.equals("addNewInventory"))

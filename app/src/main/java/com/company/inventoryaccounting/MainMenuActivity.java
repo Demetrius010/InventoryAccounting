@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -21,93 +20,67 @@ import java.util.Objects;
 
 public class MainMenuActivity extends AppCompatActivity implements BackgroundWorkerResponse {
 
-    Button btnAllEquip, btnBrokenEquip, btnEquipUnderRepair, bntObjects, btnInventory;
-    Spinner spnAddress;
-    JSONObject jsonObject;
-    JSONArray jsonArray;
-    Map<String, String> allAddresses;
+    Button btnAllEquip, bntEmployee, btnPlaces;
+    //JSONObject jsonObject;
+    //JSONArray jsonArray;
+    //Map<String, String> allAddresses; //String selectedAddressId = getKeyByValue(allAddresses, spnAddress.getSelectedItem().toString());
 
-    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+    /*public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
         for (Map.Entry<T, E> entry : map.entrySet()) {
             if (Objects.equals(value, entry.getValue())) {
                 return entry.getKey();
             }
         }
         return null;
-    }
+    }*/
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
-        btnAllEquip = (Button)findViewById(R.id.btnAllEquip);
-        btnBrokenEquip = (Button)findViewById(R.id.btnBrokenEquip);
-        btnEquipUnderRepair = (Button)findViewById(R.id.btnEquipUnderRepair);
-        bntObjects = (Button)findViewById(R.id.bntObjects);
-        btnInventory = (Button)findViewById(R.id.btnInventory);
-        spnAddress = (Spinner)findViewById(R.id.spnAddress);
+        btnAllEquip = (Button) findViewById(R.id.btnAllEquip);
+        bntEmployee = (Button) findViewById(R.id.btnEmployee);
+        btnPlaces = (Button) findViewById(R.id.btnPlaces);
 
-        ifAdmin();
-        getAddresses();
+        new BackgroundWorker(this, this).execute("getEquip");
+        new BackgroundWorker(this, this).execute("getStaff");
+        new BackgroundWorker(this, this).execute("getAddresses");
     }
 
-    private void ifAdmin(){
-        if (((GlobalInventoryaccounting) this.getApplication()).isAdmin())
-        {
-            //Log.d("Value","admin = " + ((GlobalInventoryaccounting) this.getApplication()).isAdmin());
-            bntObjects.setVisibility(View.VISIBLE);
-            btnInventory.setVisibility(View.VISIBLE);
-        }
-        else{
-            bntObjects.setVisibility(View.INVISIBLE);
-            btnInventory.setVisibility(View.INVISIBLE);
-        }
-    }
-
-    private  void getAddresses(){
-        String type = "getAddresses";
-        new BackgroundWorker(this, this).execute(type);
-    }
-
-    private void getEquip(String equipCond)
-    {
-        String type = "getEquip";
-        String selectedAddressId = getKeyByValue(allAddresses, spnAddress.getSelectedItem().toString());
-        //Log.d("Value", "selectedAddressId = " + selectedAddressId);
-        new BackgroundWorker(this, this).execute(type, selectedAddressId, equipCond);
-    }
-
-    public void onAllEquipButton(View view){
-        String condition = "Работает";
-        getEquip(condition);
-    }
-
-
-    public void onBrokenEquipButton(View view){
-        String condition = "Сломан";
-        getEquip(condition);
-    }
-
-    public void onEquipUnderRepairButton(View view){
-        String condition = "В ремонте";
-        getEquip(condition);
-    }
-
-    public void onObjectsButton(View view){
-        Intent intent = new Intent(".ChangePlaceActivity");
+    public void onAllEquipButton(View view) {
+        Intent intent = new Intent(".ToolListActivity");
         startActivity(intent);
     }
 
-    public void onInventoryButton(View view){
-        Intent intent = new Intent(".ChangeInventoryActivity");
-        startActivity(intent);
+
+    public void onEmployeeButton(View view) {
+
     }
 
+    public void onPlacesButton(View view) {
+
+    }
 
 
     @Override
     public void processFinish(String output, String typeFinishedProc) {
-        if(typeFinishedProc.equals("getAddresses"))
+        if (typeFinishedProc.equals("getEquip")) {
+            ((GlobalInventoryaccounting)this.getApplication()).setEquipmentData(output);
+            //Log.d("Value","EquipmentData = " + ((GlobalInventoryaccounting) this.getApplication()).getEquipmentData());
+        }
+        else if(typeFinishedProc.equals("getStaff")){
+            ((GlobalInventoryaccounting)this.getApplication()).setStaffData(output);
+            //Log.d("Value","StaffData = " + ((GlobalInventoryaccounting) this.getApplication()).getStaffData());
+        }
+        else if(typeFinishedProc.equals("getAddresses")){
+            ((GlobalInventoryaccounting)this.getApplication()).setAddressesData(output);
+            //Log.d("Value","AddressesData = " + ((GlobalInventoryaccounting) this.getApplication()).getAddressesData());
+        }
+    }
+}
+
+        /*if(typeFinishedProc.equals("getAddresses"))
         {
             ((GlobalInventoryaccounting)this.getApplication()).setAddressesData(output);
             try {
@@ -127,39 +100,26 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
                 //ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allAddresses);
                 ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new ArrayList<String>(allAddresses.values()));
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spnAddress.setAdapter(dataAdapter);
+                //spnAddress.setAdapter(dataAdapter);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        else if (typeFinishedProc.equals("getEquip")) {
-            try {
-                String id, name, inventory_num, category, responsible, space, equip_condition;
-                jsonObject = new JSONObject(output);
-                jsonArray = jsonObject.getJSONArray("server_response");
-                if (jsonArray.length() == 0)
-                {
-                    Toast.makeText(this, "Инвентарь отсутствует", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonObj = jsonArray.getJSONObject(i);
-                    id =  jsonObj.getString("id");
-                    name = jsonObj.getString("name");
-                    inventory_num = jsonObj.getString("inventory_num");
-                    category = jsonObj.getString("category");
-                    responsible = jsonObj.getString("responsible");
-                    space = jsonObj.getString("space");
-                    equip_condition = jsonObj.getString("equip_condition");
-                    //Log.d("Values", "getAllEquip id =" + id + " name = " + name + " inventoryNum = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
-                }
-                Intent intent = new Intent(".ToolListActivity");
+       */
+
+
+       /*private void ifAdmin(){
+        if (((GlobalInventoryaccounting) this.getApplication()).isAdmin())
+        {
+            //Log.d("Value","admin = " + ((GlobalInventoryaccounting) this.getApplication()).isAdmin());
+            bntObjects.setVisibility(View.VISIBLE);
+        }
+    }*/
+
+
+       /*
+       *                 Intent intent = new Intent(".ToolListActivity");
                 intent.putExtra("jsonArray", jsonArray.toString()); //in new act in onCreate() {.... variable = getIntent().getExtras().getString("NAME")}
                 startActivity(intent);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-}
+       *
+       * */

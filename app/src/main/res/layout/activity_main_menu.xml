@@ -7,104 +7,111 @@
     tools:context=".MainMenuActivity">
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/BKLogo"
         android:layout_width="wrap_content"
         android:layout_height="160dp"
         android:layout_marginTop="8dp"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/bkstroy" />
 
-    <Spinner
-        android:id="@+id/spnAddress"
-        android:layout_width="250dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:gravity="center"
-        android:textAlignment="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.503"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
-
     <Button
         android:id="@+id/btnAllEquip"
         android:layout_width="250dp"
-        android:layout_height="45dp"
+        android:layout_height="40dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="8dp"
         android:background="@color/colorPrimary"
         android:onClick="onAllEquipButton"
-        android:text="Все инструменты"
+        android:text="Инвентарь"
         android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spnAddress" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
     <Button
-        android:id="@+id/btnBrokenEquip"
-        android:onClick="onBrokenEquipButton"
+        android:id="@+id/btnEmployee"
         android:layout_width="250dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:background="@color/colorPrimary"
-        android:text="Сломанный инструмент"
+        android:onClick="onEmployeeButton"
+        android:text="Сотрудники"
         android:textColor="#FFFFFF"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnAllEquip" />
 
     <Button
-        android:id="@+id/btnEquipUnderRepair"
-        android:onClick="onEquipUnderRepairButton"
+        android:id="@+id/btnPlaces"
         android:layout_width="250dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:background="@color/colorPrimary"
-        android:text="В ремонте"
+        android:onClick="onPlacesButton"
+        android:text="Помещения"
         android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBrokenEquip" />
+        app:layout_constraintTop_toBottomOf="@+id/btnEmployee" />
 
     <Button
-        android:id="@+id/bntObjects"
+        android:id="@+id/btnScan"
         android:layout_width="250dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:background="@color/colorPrimary"
-        android:onClick="onObjectsButton"
-        android:text="Объекты строительства"
+        android:text="Сканировать"
         android:textColor="#FFFFFF"
-        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnEquipUnderRepair" />
+        app:layout_constraintTop_toBottomOf="@+id/BKLogo" />
 
-    <Button
-        android:id="@+id/btnInventory"
+    <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="250dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:background="@color/colorPrimary"
-        android:onClick="onInventoryButton"
-        android:text="Инвентарь"
-        android:textColor="#FFFFFF"
-        android:visibility="visible"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bntObjects" />
+        app:layout_constraintTop_toBottomOf="@+id/btnScan">
+
+        <EditText
+            android:id="@+id/etSearchByBarcode"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:ems="10"
+            android:hint="Поиск по коду"
+            android:inputType="textPersonName"
+            android:textSize="18sp" />
+
+        <ImageButton
+            android:id="@+id/BtnSearch"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_margin="3dp"
+            android:background="@color/colorPrimary"
+            android:contentDescription="@android:string/search_go"
+            android:padding="3dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/white_search" />
+    </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>

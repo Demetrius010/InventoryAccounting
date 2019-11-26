@@ -48,7 +48,7 @@ public class ChangeInstrument extends AppCompatActivity implements BackgroundWor
         spinCondition = (Spinner)findViewById(R.id.spinCondition);
         spinResponsible = (Spinner)findViewById(R.id.spinResponsible);
 
-        responsibleData = ((GlobalInventoryaccounting) this.getApplication()).getResponsibleData();
+        responsibleData = ((GlobalInventoryaccounting) this.getApplication()).getStaffData();
         addressesData = ((GlobalInventoryaccounting) this.getApplication()).getAddressesData();
         fillSpinCondition();
         fillSpinResponsible();

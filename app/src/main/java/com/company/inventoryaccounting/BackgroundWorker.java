@@ -37,18 +37,19 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
         type = params[0];
         String ip = "192.168.1.2:8080";//"37.20.171.61:8080";//
         String login_url = "http://"+ip+"/login.php";
-        String saveEquip_url = "http://"+ip+"/saveEquip.php";
-        String addresses_url = "http://"+ip+"/getAddresses.php";
-        String equip_url = "http://"+ip+"/getEquip.php";
-        String responsible_url = "http://"+ip+"/getResponsible.php";
-        String equipByID_url = "http://"+ip+"/getEquipById.php";
-        String addAddress_url = "http://"+ip+"/addAddress.php";
-        String changePlace_url = "http://"+ip+"/changePlace.php";
-        String removePlace_url = "http://"+ip+"/removePlace.php";
-        String getAllEquip_url = "http://"+ip+"/getAllEquip.php";
-        String addNewInventory_url = "http://"+ip+"/addNewInventory.php";
-        String saveInventory_url= "http://"+ip+"/saveInventory.php";
-        String removeInventory_url= "http://"+ip+"/removeInventory.php";
+        String getEquip_url = "http://"+ip+"/getEquip.php";
+        String getStaff_url = "http://"+ip+"/getStaff.php";
+        String getAddresses_url = "http://"+ip+"/getAddresses.php";
+        //String saveEquip_url = "http://"+ip+"/saveEquip.php";
+        //String equip_url = "http://"+ip+"/getEquip.php";
+        //String equipByID_url = "http://"+ip+"/getEquipById.php";
+        //String addAddress_url = "http://"+ip+"/addAddress.php";
+        //String changePlace_url = "http://"+ip+"/changePlace.php";
+        //String removePlace_url = "http://"+ip+"/removePlace.php";
+
+       // String addNewInventory_url = "http://"+ip+"/addNewInventory.php";
+        //String saveInventory_url= "http://"+ip+"/saveInventory.php";
+        //String removeInventory_url= "http://"+ip+"/removeInventory.php";
         if(type.equals("login")){
             try {
                 String phone = params[1];
@@ -81,10 +82,10 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 e.printStackTrace();
             }
         }
-        else if(type.equals("getAddresses")){
+        else if(type.equals("getEquip")){
             try {
                 String jsonString;
-                URL url = new URL(addresses_url);
+                URL url = new URL(getEquip_url);
                 HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
                 InputStream inputStream = httpURLConnection.getInputStream();
                 BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));
@@ -92,7 +93,6 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 while ((jsonString = bufferedReader.readLine())!= null)
                 {
                     stringBuilder.append(jsonString+"\n");
-
                 }
                 bufferedReader.close();
                 inputStream.close();
@@ -104,6 +104,51 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 e.printStackTrace();
             }
         }
+        else if(type.equals("getStaff")) {
+            try {
+                String jsonString;
+                URL url = new URL(getStaff_url);
+                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((jsonString = bufferedReader.readLine())!= null)
+                {
+                    stringBuilder.append(jsonString+"\n");
+                }
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return stringBuilder.toString().trim();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        else if(type.equals("getAddresses")){
+            try {
+                String jsonString;
+                URL url = new URL(getAddresses_url);
+                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((jsonString = bufferedReader.readLine())!= null)
+                {
+                    stringBuilder.append(jsonString+"\n");
+                }
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return stringBuilder.toString().trim();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        /*
         else if(type.equals("getEquip")){
             try {
                 String address = params[1];
@@ -141,6 +186,7 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 e.printStackTrace();
             }
         }
+
         else if(type.equals("getResponsible")) {
             try {
                 String jsonString;
@@ -344,28 +390,6 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 e.printStackTrace();
             }
         }
-        else if(type.equals("getAllEquip")){
-            try {
-                String jsonString;
-                URL url = new URL(getAllEquip_url);
-                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-                InputStream inputStream = httpURLConnection.getInputStream();
-                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));
-                StringBuilder stringBuilder = new StringBuilder();
-                while ((jsonString = bufferedReader.readLine())!= null)
-                {
-                    stringBuilder.append(jsonString+"\n");
-                }
-                bufferedReader.close();
-                inputStream.close();
-                httpURLConnection.disconnect();
-                return stringBuilder.toString().trim();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e){
-                e.printStackTrace();
-            }
-        }
         else if (type.equals("addNewInventory")){
             try {
                 String name = params[1];
@@ -484,7 +508,7 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 e.printStackTrace();
             }
         }
-
+        */
         return null;
     }
 
