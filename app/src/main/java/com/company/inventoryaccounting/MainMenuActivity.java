@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -33,6 +34,7 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
         }
         return null;
     }*/
+    EditText search;
 
 
     @Override
@@ -46,6 +48,8 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
         new BackgroundWorker(this, this).execute("getEquip");
         new BackgroundWorker(this, this).execute("getStaff");
         new BackgroundWorker(this, this).execute("getAddresses");
+        search = findViewById(R.id.etSearchByBarcode);
+
     }
 
     public void onAllEquipButton(View view) {

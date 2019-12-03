@@ -1,14 +1,13 @@
 package com.company.inventoryaccounting;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Debug;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -19,15 +18,10 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListPopupWindow;
-import android.widget.Spinner;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -35,23 +29,34 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
-public class ToolListActivity extends AppCompatActivity{ //implements BackgroundWorkerResponse {
+public class ToolListActivity extends AppCompatActivity{// implements BackgroundWorkerResponse {
     LinearLayout myLinearLayout;
+    SearchView searchView;
 
     JSONObject jsonObject;
     JSONArray jsonArray;
 
     Map<String, String> allResponsible;
     Map<String, String> allAddresses;
-    Map<String, String> allCategories = new HashMap<String, String>();;
+    Map<String, String> allCategories;
 
-    //String jsonString;
+    Boolean placeFilterIsAct = false, categoryFilterIsAct = false, conditionFilterIsAct = false, employeeFilterIsAct = false; // флаг выбранного фильтра
+    Boolean placeFilterWasChanged = false, categoryFilterWasChanged = false, conditionFilterWasChanged = false, employeeFilterWasChanged = false, sortWasChanged = true; // флаг что фильтр изменен
+    Boolean ascendingSort = true, descendingSort = false, alphabetSort = false, reverseAlphabetSort = false; // флаг сортировки
+    SubMenu placeFilterSubMenu, categoryFilterSubMenu, conditionFilterSubMenu, employeeFilterSubMenu;// подменю каждого фильтра
+
+    ArrayList<String> selectedPlace = new ArrayList<String>();  //Хранят выбранные пункты фильтров
+    ArrayList<String> selectedEmployee = new ArrayList<String>();
+    ArrayList<String> selectedCondition = new ArrayList<String>();
+    ArrayList<String> selectedCategory = new ArrayList<String>();
+
+    ArrayList<ChoosedTool> choosedToolArrayList = new ArrayList<ChoosedTool>();//Отобранные данные удовлетворяющие фильтру
+    String searchStr = "";
     //Spinner spnCategory;
-
     //private ListPopupWindow lpw;
     //private String[] list;
 
@@ -59,12 +64,16 @@ public class ToolListActivity extends AppCompatActivity{ //implements Background
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tool_list);
-
+        searchView = (SearchView) findViewById(R.id.searchView);
         myLinearLayout = (LinearLayout) findViewById(R.id.linLayout);
-        fillActWithItems();
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        fillAddressesDictionary();
+        fillCategoryDictionary();
+        fillResponsibleDictionary();
+        fillActWithItems();
+
         /*jsonString = getIntent().getStringExtra("jsonArray");
         spnCategory = (Spinner)findViewById(R.id.spnCategory);
         spnCategory.setAdapter(null);
@@ -72,61 +81,443 @@ public class ToolListActivity extends AppCompatActivity{ //implements Background
    }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+    protected void onStart() {
+        super.onStart();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                searchStr = s;
+                fillActWithItems();
+                //Log.d("Value", "onQueryTextSubmit = " + searchStr);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                searchStr = s;
+                fillActWithItems();
+                //Log.d("Value", "onQueryTextChange = " + searchStr);
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) { // выполняем при создании меню
+        MenuInflater inflater = getMenuInflater(); // подключаем меню
         inflater.inflate(R.menu.tool_list_menu, menu);
-        SubMenu placeFilterSubMenu = menu.getItem(1).getSubMenu().getItem(0).getSubMenu();
-        for (Map.Entry<String,String> entry : allAddresses.entrySet()) //String selectedAddressId = getKeyByValue(allAddresses, spnAddress.getSelectedItem().toString());
+        placeFilterSubMenu = menu.getItem(1).getSubMenu().getItem(0).getSubMenu();
+        for (Map.Entry<String,String> entry : allAddresses.entrySet()) // заполняем фильтр адресс
         {
-            placeFilterSubMenu.add(0,Integer.parseInt(entry.getKey()),0,entry.getValue());//add(int groupId, int itemId, int order, CharSequence title)
+            placeFilterSubMenu.add(0,Integer.parseInt(entry.getKey()),0,entry.getValue()).setCheckable(true);//add(int groupId, int itemId, int order, CharSequence title)
         }
-        SubMenu categoryFilterSubMenu = menu.getItem(1).getSubMenu().getItem(1).getSubMenu();
-        for (Map.Entry<String,String> entry : allCategories.entrySet())
+        categoryFilterSubMenu = menu.getItem(1).getSubMenu().getItem(1).getSubMenu();
+        for (Map.Entry<String,String> entry : allCategories.entrySet())// заполняем фильтр категории
         {
-            categoryFilterSubMenu.add(1,Integer.parseInt(entry.getKey()),0,entry.getValue());
+            categoryFilterSubMenu.add(1,Integer.parseInt(entry.getKey()),0,entry.getValue()).setCheckable(true);
         }
-        //SubMenu conditionFilterSubMenu = menu.getItem(1).getSubMenu().getItem(2).getSubMenu();
-        SubMenu employeeFilterSubMenu = menu.getItem(1).getSubMenu().getItem(3).getSubMenu();
-        for (Map.Entry<String,String> entry : allResponsible.entrySet())
+        conditionFilterSubMenu = menu.getItem(1).getSubMenu().getItem(2).getSubMenu();
+        employeeFilterSubMenu = menu.getItem(1).getSubMenu().getItem(3).getSubMenu();
+        for (Map.Entry<String,String> entry : allResponsible.entrySet())// заполняем фильтр работников
         {
-            employeeFilterSubMenu.add(3,Integer.parseInt(entry.getKey()),0,entry.getValue());
+            employeeFilterSubMenu.add(3,Integer.parseInt(entry.getKey()),0,entry.getValue()).setCheckable(true);
         }
         return true;
     }
 
-    /*@Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        //Menu myFilterMenu = (Menu) menu.getItem(R.id.placeFilterMenu);
-        return super.onPrepareOptionsMenu(menu);
-    }*/
-
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) { //выполняем после того как создали меню
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.addOnMenuVisibilityListener(new ActionBar.OnMenuVisibilityListener() {
+            @Override
+            public void onMenuVisibilityChanged(boolean b) { // получаем состояние меню свернуто / развернуто
+                if((placeFilterWasChanged || conditionFilterWasChanged || categoryFilterWasChanged || employeeFilterWasChanged || sortWasChanged) && !b) //если был установлен фильтр для места и фильтр был свернут
+                    fillActWithItems(); // если свернуто и была выбрана сортировка или фильтр то получаем соответствующие инструменты
+                    //Log.d("Value", "value: onMenuVisibilityChanged = " + b);
+            }
+        });
+        return true;
+    }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d("Value", "value: " + item.getTitle());
+    public boolean onOptionsItemSelected(MenuItem item) {// выполняем когда выбран определенный пункт меню
         switch (item.getItemId()) {
             case R.id.ascendingSort:
-                if (item.isChecked()) item.setChecked(false);
-                else item.setChecked(true);
+                item.setChecked(!item.isChecked());
+                ascendingSort = true;
+                sortWasChanged = true;
+                descendingSort = alphabetSort = reverseAlphabetSort = false;
                 return true;
             case R.id.descendingSort:
-                if (item.isChecked()) item.setChecked(false);
-                else item.setChecked(true);
+                item.setChecked(!item.isChecked());
+                descendingSort = true;
+                sortWasChanged = true;
+                ascendingSort = alphabetSort = reverseAlphabetSort = false;
                 return true;
             case R.id.alphabetSort:
-                if (item.isChecked()) item.setChecked(false);
-                else item.setChecked(true);
+                item.setChecked(!item.isChecked());
+                alphabetSort = true;
+                sortWasChanged = true;
+                ascendingSort = descendingSort = reverseAlphabetSort = false;
                 return true;
             case R.id.reverseAlphabetSort:
-                if (item.isChecked()) item.setChecked(false);
-                else item.setChecked(true);
+                item.setChecked(!item.isChecked());
+                reverseAlphabetSort = true;
+                sortWasChanged = true;
+                alphabetSort = ascendingSort = descendingSort = false;
                 return true;
-            default:
-                return super.onOptionsItemSelected(item); //super - текущий экземпляр родительского класса.
+            case R.id.filterBtn:
+            case R.id.sortBtn:
+                placeFilterIsAct = false;
+                categoryFilterIsAct = false;
+                conditionFilterIsAct = false;
+                employeeFilterIsAct = false;
+                placeFilterWasChanged = false;
+                categoryFilterWasChanged = false;
+                conditionFilterWasChanged = false;
+                employeeFilterWasChanged = false;
+                sortWasChanged = false;
+                break;
+            case R.id.placeFilter:
+                placeFilterIsAct = true;
+                return true;
+            case R.id.categoryFilter:
+                categoryFilterIsAct = true;
+                return true;
+            case R.id.conditionFilter:
+                conditionFilterIsAct = true;
+                return true;
+            case R.id.employeeFilter:
+                employeeFilterIsAct = true;
+                return true;
+        }
+
+        if(placeFilterIsAct){
+            placeFilterWasChanged = true;
+            //Log.d("Value", "value: " + item.getTitle());
+            if(item.getItemId() == R.id.placeNone) { // если место "не выбрано" то убираем все галки
+                for(int i = 0; i <placeFilterSubMenu.size(); i++){
+                    placeFilterSubMenu.getItem(i).setChecked(false);
+                }
+                item.setChecked(true);
+                selectedPlace.clear(); //и очищаем список выбранных мест
+                placeFilterSubMenu.getItem().setIcon(null); // и убераем икону
+            }
+            else{
+                placeFilterSubMenu.getItem(0).setChecked(false);
+                if(item.isChecked()){
+                    item.setChecked(false);
+                    selectedPlace.remove(item.getTitle().toString());// если снали галку удаляем из списка
+                }
+                else {
+                    item.setChecked(true);// если поставили то добавляем в список
+                    if(!selectedPlace.contains(item.getTitle().toString())) {
+                        selectedPlace.add(item.getTitle().toString());
+                    }
+                }
+                placeFilterSubMenu.getItem().setIcon(R.drawable.ic_playlist_add_check_black);
+            }
+        }
+        else if(categoryFilterIsAct){
+            categoryFilterWasChanged = true;
+            //Log.d("Value", "value: " + item.getTitle());
+            if(item.getItemId() == R.id.categoryNone) {
+                for(int i = 0; i <categoryFilterSubMenu.size(); i++){
+                    categoryFilterSubMenu.getItem(i).setChecked(false);
+                }
+                item.setChecked(true);
+                selectedCategory.clear();
+                categoryFilterSubMenu.getItem().setIcon(null);
+            }
+            else{
+                categoryFilterSubMenu.getItem(0).setChecked(false);
+                if(item.isChecked()){
+                    item.setChecked(false);
+                    selectedCategory.remove(item.getTitle().toString());
+                }
+                else {
+                    item.setChecked(true);
+                    if(!selectedCategory.contains(item.getTitle().toString())) {
+                        selectedCategory.add(item.getTitle().toString());
+                    }
+                }
+                categoryFilterSubMenu.getItem().setIcon(R.drawable.ic_playlist_add_check_black);
+            }
+        }
+        else if(conditionFilterIsAct){
+            conditionFilterWasChanged = true;
+            //Log.d("Value", "value: " + item.getTitle());
+            if(item.getItemId() == R.id.conditionNone) {
+                for(int i = 0; i <conditionFilterSubMenu.size(); i++){
+                    conditionFilterSubMenu.getItem(i).setChecked(false);
+                }
+                item.setChecked(true);
+                selectedCondition.clear();
+                conditionFilterSubMenu.getItem().setIcon(null);
+            }
+            else{
+                conditionFilterSubMenu.getItem(0).setChecked(false);
+                if(item.isChecked()){
+                    item.setChecked(false);
+                    selectedCondition.remove(item.getTitle().toString());
+                }
+                else {
+                    item.setChecked(true);
+                    selectedCondition.add(item.getTitle().toString());
+                }
+                conditionFilterSubMenu.getItem().setIcon(R.drawable.ic_playlist_add_check_black);
+            }
+        }
+        else if(employeeFilterIsAct){
+            employeeFilterWasChanged = true;
+            //Log.d("Value", "value: " + item.getTitle());
+            if(item.getItemId() == R.id.employeeNone) {
+                for(int i = 0; i <employeeFilterSubMenu.size(); i++){
+                    employeeFilterSubMenu.getItem(i).setChecked(false);
+                }
+                item.setChecked(true);
+                selectedEmployee.clear();
+                employeeFilterSubMenu.getItem().setIcon(null);
+            }
+            else{
+                employeeFilterSubMenu.getItem(0).setChecked(false);
+                if(item.isChecked()){
+                    item.setChecked(false);
+                    selectedEmployee.remove(item.getTitle().toString());
+                }
+                else {
+                    item.setChecked(true);
+                    selectedEmployee.add(item.getTitle().toString());
+                }
+                employeeFilterSubMenu.getItem().setIcon(R.drawable.ic_playlist_add_check_black);
+            }
+        }
+
+        if(placeFilterIsAct || categoryFilterIsAct || conditionFilterIsAct || employeeFilterIsAct){/*Подавление сокрытия меню*/
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW); //marking the item as it has expandable/collapsible behavior
+            item.setActionView(new View(this)); //is a view when item is in expanded state.It is just a dummy view because we will never let it expand
+            item.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {// so it will call this
+                @Override //returning false from both the methods of setOnActionExpandListener to suppress expansion and collapsing of the item so the view we gave in previous step would never show up and menu would remain open.
+                public boolean onMenuItemActionExpand(MenuItem item) {
+                    return false;
+                }
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item) {
+                    return false;
+                }
+            });
+            return false;
+        }
+        return true; ////default: return super.onOptionsItemSelected(item); //super - текущий экземпляр родительского класса.
+    }
+
+    private void fillActWithItems(){ //Нужно: +ИМЯ,  +СОСТОЯНИЕ, +ИНВЕНТАРНЫЙ НОМЕР, +АДРЕС, +ОТВЕТСТВЕННЫЙ
+        myLinearLayout.removeAllViews();
+        choosedToolArrayList.clear();
+        String idInst, name = "", inventory_num, category, responsible, condition, address;
+        String text = "";
+        try {
+            jsonObject = new JSONObject(((GlobalInventoryaccounting) this.getApplication()).getEquipmentData());
+            jsonArray = jsonObject.getJSONArray("server_response");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObj = jsonArray.getJSONObject(i);
+                address = jsonObj.getString("space");
+                category = jsonObj.getString("category");
+                condition = jsonObj.getString("equip_condition");
+                responsible = jsonObj.getString("responsible");
+                if((selectedPlace.contains(allAddresses.get(address)) || selectedPlace.isEmpty()) && (selectedEmployee.contains(allResponsible.get(responsible)) || selectedEmployee.isEmpty()) && (selectedCondition.contains(condition) || selectedCondition.isEmpty()) && (selectedCategory.contains(category) || selectedCategory.isEmpty())) {
+                    name = jsonObj.getString("name");
+                    if(searchStr.length() == 0 || name.toLowerCase().contains(searchStr.toLowerCase())){//выдача тех инструментов в назваии которых есть искомое слово в случае если оно было введено
+                        idInst = jsonObj.getString("id");
+                        inventory_num = jsonObj.getString("inventory_num");
+                        text = name + "\n" + condition + " | " + allAddresses.get(address) + " | " + allResponsible.get(responsible) + " | " + inventory_num;// СОБИРАЕМ ИНФОРМАЦИЮ ОБ ОДНОМ ИНСТРУМЕНТЕ В СТРОКУ
+                        choosedToolArrayList.add(new ChoosedTool(text, name, idInst));
+                    }
+                }
+            }
+            addChoosedToolsOnAct();
+        }
+       catch (JSONException e) {
+           e.printStackTrace();
         }
     }
 
-    public void onImgSortBtnClick (View view){
+    private TextView createTextView(String text, final String instrumentID, int nameLength){
+        LinearLayout.LayoutParams myLinearLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        SpannableString ss;
+        TextView textView = new TextView(this);
+        ss = new SpannableString(text);
+        ss.setSpan(new StyleSpan(Typeface.BOLD), 0, nameLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // ДЕЛАЕМ ИМЯ ИНСТРУМЕНТА ЖИРНЫМ
+        ss.setSpan(new RelativeSizeSpan(1.5f), 0, nameLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // Устанавливаем размер имени инструмента
+        ss.setSpan(new ForegroundColorSpan(Color.BLACK), 0, nameLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);// Устанавливаем цвет текста имени инструмента
+        ss.setSpan(new RelativeSizeSpan(1.1f), nameLength, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // Устанавливаем размер текста после имени
+        ss.setSpan(new ForegroundColorSpan(Color.DKGRAY), nameLength, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);// Устанавливаем цвет текста после имени
+        textView.setLayoutParams(myLinearLayoutParams);
+        textView.setText(ss);
+        textView.setClickable(true);
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(".ChangeInstrument");
+                intent.putExtra("idInstrument", instrumentID); //in new act in onCreate() {.... variable = getIntent().getExtras().getString("NAME")}
+                startActivity(intent);
+            }
+        });
+        TypedValue typedValue = new TypedValue(); // добавляем разделительную черту и отступы, устанавливая стиль
+        getTheme().resolveAttribute(android.R.attr.editTextBackground, typedValue, true);
+        if (typedValue.resourceId != 0) {// it's probably a good idea to check if the color wasn't specified as a resource
+            textView.setBackgroundResource(typedValue.resourceId);
+        } else {
+            // this should work whether there was a resource id or not
+            textView.setBackgroundColor(typedValue.data);
+        }
+        return textView;
+    } // создаем TextView для отобранного инструмента
+
+    private void addChoosedToolsOnAct(){
+        String dataString, name, id;
+        if(ascendingSort){// в зависимости от сортировки сортируем список и выводим отобранные инструменты в своих TextView
+            Collections.sort(choosedToolArrayList, new SortById());
+            for (int i = 0; i < choosedToolArrayList.size(); i++)
+            {
+                dataString = choosedToolArrayList.get(i).toolData;
+                name = choosedToolArrayList.get(i).toolName;
+                id = choosedToolArrayList.get(i).toolID;
+                myLinearLayout.addView(createTextView(dataString, id, name.length()));
+            }
+        }
+        else if(descendingSort){
+            Collections.sort(choosedToolArrayList, new SortById());
+            for (int i = choosedToolArrayList.size()-1; i >= 0; i--)
+            {
+                dataString = choosedToolArrayList.get(i).toolData;
+                name = choosedToolArrayList.get(i).toolName;
+                id = choosedToolArrayList.get(i).toolID;
+                myLinearLayout.addView(createTextView(dataString, id, name.length()));
+            }
+        }
+        else if(alphabetSort){
+            Collections.sort(choosedToolArrayList, new SortByName());
+            for (int i = 0; i < choosedToolArrayList.size(); i++)
+            {
+                dataString = choosedToolArrayList.get(i).toolData;
+                name = choosedToolArrayList.get(i).toolName;
+                id = choosedToolArrayList.get(i).toolID;
+                myLinearLayout.addView(createTextView(dataString, id, name.length()));
+            }
+        }
+        else if(reverseAlphabetSort){
+            Collections.sort(choosedToolArrayList, new SortByName());
+            for (int i = choosedToolArrayList.size()-1; i >= 0; i--)
+            {
+                dataString = choosedToolArrayList.get(i).toolData;
+                name = choosedToolArrayList.get(i).toolName;
+                id = choosedToolArrayList.get(i).toolID;
+                myLinearLayout.addView(createTextView(dataString, id, name.length()));
+            }
+        }
+    }
+
+    private void fillCategoryDictionary(){ // получаем категории
+        String instrumentID, category;
+        allCategories = new HashMap<String, String>();//map.put("dog", "type of animal");//System.out.println(map.get("dog"));
+        try {
+            jsonObject = new JSONObject(((GlobalInventoryaccounting) this.getApplication()).getEquipmentData());
+            jsonArray = jsonObject.getJSONArray("server_response");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObj = jsonArray.getJSONObject(i);
+                instrumentID = jsonObj.getString("id");
+                category = jsonObj.getString("category");
+                if(!(allCategories.containsValue(category))) {//заполняем список категорий который будет отображаться в сортировке
+                    allCategories.put(instrumentID, category);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    private void fillResponsibleDictionary(){// получаем ответственных
+        String reponsibleId, responsibleFullName;
+        allResponsible = new HashMap<String, String>();//map.put("dog", "type of animal");//System.out.println(map.get("dog"));
+        try {
+            jsonObject = new JSONObject(((GlobalInventoryaccounting)this.getApplication()).getStaffData());
+            jsonArray = jsonObject.getJSONArray("server_response");
+            for(int i = 0; i < jsonArray.length(); i++){
+                JSONObject jsonObj = jsonArray.getJSONObject(i);
+                reponsibleId = jsonObj.getString("id");
+                responsibleFullName = jsonObj.getString("full_name");;
+                allResponsible.put(reponsibleId, responsibleFullName);
+                //Log.d("Value", "reponsibleId = " + reponsibleId + " responsibleFullName = " + allResponsible.get(reponsibleId));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void fillAddressesDictionary(){// получаем адреса
+        String addressId, shortAddress;
+        allAddresses = new HashMap<String, String>();//map.put("dog", "type of animal");//System.out.println(map.get("dog"));
+        try {
+            jsonObject = new JSONObject(((GlobalInventoryaccounting)this.getApplication()).getAddressesData());
+            jsonArray = jsonObject.getJSONArray("server_response");
+            for(int i = 0; i < jsonArray.length(); i++){
+                JSONObject jsonObj = jsonArray.getJSONObject(i);
+                addressId = jsonObj.getString("id");
+                shortAddress = jsonObj.getString("short_address");;
+                allAddresses.put(addressId, shortAddress);
+                //Log.d("Value", "reponsibleId = " + reponsibleId + " responsibleFullName = " + allResponsible.get(reponsibleId));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+
+
+/* private void getCategories()
+    {/*
+        try {
+            String category;
+            List<String> allCategories = new ArrayList<String>();
+            JSONArray jsonArray = new JSONArray(jsonString);
+            //Log.d("Value", "jsonString" + jsonString);
+            for(int i = 0; i < jsonArray.length(); i++){
+                JSONObject jsonObj = jsonArray.getJSONObject(i);
+                category = jsonObj.getString("category");
+                if (!allCategories.contains(category)) {
+                    allCategories.add(category);
+                }
+            }
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allCategories);
+            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spnCategory.setAdapter(dataAdapter);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }*/
+ //   }
+
+
+    /*private AdapterView.OnItemSelectedListener listener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            ((TextView) parent.getChildAt(0)).setTextColor(Color.WHITE);
+            ((TextView) parent.getChildAt(0)).setTextSize(20);
+            fillActWithItems();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    };
+
+    @Override
+    public void processFinish(String output, String typeFinishedProc) {
+
+    }*/
+
+  /*  public void onImgSortBtnClick (View view){
         LinearLayout sortLinLayout = new LinearLayout(this);
         LinearLayout.LayoutParams sortLinLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         //sortLinLayoutParams.width = 10;
@@ -149,157 +540,7 @@ public class ToolListActivity extends AppCompatActivity{ //implements Background
    }
 
     public void onBtnFilterClick(View view){
-
-    }
-
-    private void fillActWithItems(){ //Нужно: +ИМЯ,  +СОСТОЯНИЕ, +ИНВЕНТАРНЫЙ НОМЕР, +АДРЕС, +ОТВЕТСТВЕННЫЙ
-        fillResponsibleDictionary();
-        fillAddressesDictionary();
-
-        myLinearLayout.removeAllViews();
-        LinearLayout.LayoutParams myLinearLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        TextView textView;
-        SpannableString ss;
-
-        String name = "", inventory_num, category, responsible, condition, address;
-        String text = "";
-        try {
-            jsonObject = new JSONObject(((GlobalInventoryaccounting) this.getApplication()).getEquipmentData());
-            jsonArray = jsonObject.getJSONArray("server_response");
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObj = jsonArray.getJSONObject(i);
-                //if(jsonObj.getString("category").equals(spnCategory.getSelectedItem().toString()))
-                //{
-                    final String idInst = jsonObj.getString("id");
-                    name = jsonObj.getString("name");
-                    inventory_num = jsonObj.getString("inventory_num");
-                    category = jsonObj.getString("category");
-                    if(!(allCategories.containsValue(category))) {
-                        allCategories.put(idInst, category);
-                    }
-                    responsible = jsonObj.getString("responsible");
-                    condition = jsonObj.getString("equip_condition");
-                    address = jsonObj.getString("space");
-                    text = name + "\n" + condition + " | " + allAddresses.get(address) + " | " + allResponsible.get(responsible) + " | " + inventory_num;// СОБИРАЕМ ИНФОРМАЦИЮ ОБ ОДНОМ ИНСТРУМЕНТЕ В СТРОКУ
-
-                    textView = new TextView(this);
-                    ss = new SpannableString(text);
-                    ss.setSpan(new StyleSpan(Typeface.BOLD), 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // ДЕЛАЕМ ИМЯ ИНСТРУМЕНТА ЖИРНЫМ
-                    ss.setSpan(new RelativeSizeSpan(1.5f), 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // Устанавливаем размер имени инструмента
-                    ss.setSpan(new ForegroundColorSpan(Color.BLACK), 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);// Устанавливаем цвет текста имени инструмента
-                    ss.setSpan(new RelativeSizeSpan(1.1f), name.length(), text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // Устанавливаем размер текста после имени
-                    ss.setSpan(new ForegroundColorSpan(Color.DKGRAY), name.length(), text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);// Устанавливаем цвет текста после имени
-                    textView.setLayoutParams(myLinearLayoutParams);
-                    textView.setText(ss);
-                    textView.setClickable(true);
-                    textView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            /*Intent intent = new Intent(".ChangeInstrument");
-                            intent.putExtra("idInstrument", idInst); //in new act in onCreate() {.... variable = getIntent().getExtras().getString("NAME")}
-                            startActivity(intent);*/
-                        }
-                    });
-
-                    TypedValue typedValue = new TypedValue();
-                    getTheme().resolveAttribute(android.R.attr.editTextBackground, typedValue, true);
-                    if (typedValue.resourceId != 0) {// it's probably a good idea to check if the color wasn't specified as a resource
-                        textView.setBackgroundResource(typedValue.resourceId);
-                    } else {
-                        // this should work whether there was a resource id or not
-                        textView.setBackgroundColor(typedValue.data);
-                    }
-
-                    myLinearLayout.addView(textView);
-                //}
-            }
-        }
-       catch (JSONException e) {
-           e.printStackTrace();
-        }
-    }
-
-    private void fillResponsibleDictionary(){
-        String reponsibleId, responsibleFullName;
-        allResponsible = new HashMap<String, String>();//map.put("dog", "type of animal");//System.out.println(map.get("dog"));
-        try {
-            jsonObject = new JSONObject(((GlobalInventoryaccounting)this.getApplication()).getStaffData());
-            jsonArray = jsonObject.getJSONArray("server_response");
-            for(int i = 0; i < jsonArray.length(); i++){
-                JSONObject jsonObj = jsonArray.getJSONObject(i);
-                reponsibleId = jsonObj.getString("id");
-                responsibleFullName = jsonObj.getString("full_name");;
-                allResponsible.put(reponsibleId, responsibleFullName);
-                //Log.d("Value", "reponsibleId = " + reponsibleId + " responsibleFullName = " + allResponsible.get(reponsibleId));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void fillAddressesDictionary(){
-        String addressId, shortAddress;
-        allAddresses = new HashMap<String, String>();//map.put("dog", "type of animal");//System.out.println(map.get("dog"));
-        try {
-            jsonObject = new JSONObject(((GlobalInventoryaccounting)this.getApplication()).getAddressesData());
-            jsonArray = jsonObject.getJSONArray("server_response");
-            for(int i = 0; i < jsonArray.length(); i++){
-                JSONObject jsonObj = jsonArray.getJSONObject(i);
-                addressId = jsonObj.getString("id");
-                shortAddress = jsonObj.getString("short_address");;
-                allAddresses.put(addressId, shortAddress);
-                //Log.d("Value", "reponsibleId = " + reponsibleId + " responsibleFullName = " + allResponsible.get(reponsibleId));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void getCategories()
-    {/*
-        try {
-            String category;
-            List<String> allCategories = new ArrayList<String>();
-            JSONArray jsonArray = new JSONArray(jsonString);
-            //Log.d("Value", "jsonString" + jsonString);
-            for(int i = 0; i < jsonArray.length(); i++){
-                JSONObject jsonObj = jsonArray.getJSONObject(i);
-                category = jsonObj.getString("category");
-                if (!allCategories.contains(category)) {
-                    allCategories.add(category);
-                }
-            }
-            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allCategories);
-            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spnCategory.setAdapter(dataAdapter);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }*/
-    }
-
-
-    /*private AdapterView.OnItemSelectedListener listener = new AdapterView.OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            ((TextView) parent.getChildAt(0)).setTextColor(Color.WHITE);
-            ((TextView) parent.getChildAt(0)).setTextSize(20);
-            fillActWithItems();
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-
-        }
-    };
-
-    @Override
-    public void processFinish(String output, String typeFinishedProc) {
-
     }*/
-
-}
-
-
 
 /*
        AlertDialog.Builder alert = new AlertDialog.Builder(this);

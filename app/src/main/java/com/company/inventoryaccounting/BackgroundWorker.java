@@ -40,9 +40,9 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
         String getEquip_url = "http://"+ip+"/getEquip.php";
         String getStaff_url = "http://"+ip+"/getStaff.php";
         String getAddresses_url = "http://"+ip+"/getAddresses.php";
-        //String saveEquip_url = "http://"+ip+"/saveEquip.php";
+        String saveEquip_url = "http://"+ip+"/saveEquip.php";
+        String equipByID_url = "http://"+ip+"/getEquipById.php";
         //String equip_url = "http://"+ip+"/getEquip.php";
-        //String equipByID_url = "http://"+ip+"/getEquipById.php";
         //String addAddress_url = "http://"+ip+"/addAddress.php";
         //String changePlace_url = "http://"+ip+"/changePlace.php";
         //String removePlace_url = "http://"+ip+"/removePlace.php";
@@ -148,68 +148,6 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 e.printStackTrace();
             }
         }
-        /*
-        else if(type.equals("getEquip")){
-            try {
-                String address = params[1];
-                String equipCondition = params[2];
-                String jsonString;
-                URL url = new URL(equip_url);
-                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setDoOutput(true);
-                httpURLConnection.setDoInput(true);
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-                String post_data = URLEncoder.encode("space", "UTF-8") + "=" + URLEncoder.encode(address, "UTF-8")+ "&"
-                        + URLEncoder.encode("condition", "UTF-8") + "=" + URLEncoder.encode(equipCondition, "UTF-8");
-                bufferedWriter.write(post_data);
-                bufferedWriter.flush();
-                bufferedWriter.close();
-                outputStream.close();
-
-                InputStream inputStream = httpURLConnection.getInputStream();
-                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));
-                StringBuilder stringBuilder = new StringBuilder();
-                while ((jsonString = bufferedReader.readLine())!= null)
-                {
-                    stringBuilder.append(jsonString+"\n");
-                }
-                bufferedReader.close();
-                inputStream.close();
-                httpURLConnection.disconnect();
-                return stringBuilder.toString().trim();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e){
-                e.printStackTrace();
-            }
-        }
-
-        else if(type.equals("getResponsible")) {
-            try {
-                String jsonString;
-                URL url = new URL(responsible_url);
-                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-                InputStream inputStream = httpURLConnection.getInputStream();
-                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));
-                StringBuilder stringBuilder = new StringBuilder();
-                while ((jsonString = bufferedReader.readLine())!= null)
-                {
-                    stringBuilder.append(jsonString+"\n");
-
-                }
-                bufferedReader.close();
-                inputStream.close();
-                httpURLConnection.disconnect();
-                return stringBuilder.toString();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e){
-                e.printStackTrace();
-            }
-        }
         else if(type.equals("getEquipByID")){
             try {
                 String equipId = params[1];
@@ -288,6 +226,69 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 e.printStackTrace();
             }
         }
+        /*
+        else if(type.equals("getEquip")){
+            try {
+                String address = params[1];
+                String equipCondition = params[2];
+                String jsonString;
+                URL url = new URL(equip_url);
+                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.setDoInput(true);
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+                String post_data = URLEncoder.encode("space", "UTF-8") + "=" + URLEncoder.encode(address, "UTF-8")+ "&"
+                        + URLEncoder.encode("condition", "UTF-8") + "=" + URLEncoder.encode(equipCondition, "UTF-8");
+                bufferedWriter.write(post_data);
+                bufferedWriter.flush();
+                bufferedWriter.close();
+                outputStream.close();
+
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((jsonString = bufferedReader.readLine())!= null)
+                {
+                    stringBuilder.append(jsonString+"\n");
+                }
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return stringBuilder.toString().trim();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+
+        else if(type.equals("getResponsible")) {
+            try {
+                String jsonString;
+                URL url = new URL(responsible_url);
+                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((jsonString = bufferedReader.readLine())!= null)
+                {
+                    stringBuilder.append(jsonString+"\n");
+
+                }
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return stringBuilder.toString();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+
         else if (type.equals("addNewPlace")){
             try {
                 String shortAddress = params[1];
