@@ -42,14 +42,13 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
         String getAddresses_url = "http://"+ip+"/getAddresses.php";
         String saveEquip_url = "http://"+ip+"/saveEquip.php";
         String equipByID_url = "http://"+ip+"/getEquipById.php";
+        String addNewInventory_url = "http://"+ip+"/addNewInventory.php";
+        String removeInventory_url= "http://"+ip+"/removeInventory.php";
         //String equip_url = "http://"+ip+"/getEquip.php";
         //String addAddress_url = "http://"+ip+"/addAddress.php";
         //String changePlace_url = "http://"+ip+"/changePlace.php";
         //String removePlace_url = "http://"+ip+"/removePlace.php";
-
-       // String addNewInventory_url = "http://"+ip+"/addNewInventory.php";
         //String saveInventory_url= "http://"+ip+"/saveInventory.php";
-        //String removeInventory_url= "http://"+ip+"/removeInventory.php";
         if(type.equals("login")){
             try {
                 String phone = params[1];
@@ -188,10 +187,13 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 String id = params[1];
                 String name = params[2];
                 String inventory_num = params[3];
-                String responsible = params[4];
-                String place = params[5];
+                String barcode = params [4];
+                String category = params[5];
                 String condition = params[6];
-                //Log.d("Value",  "id = " + id + "\nname = " + name + "\ninventory_num = " + inventory_num + "\nresponsible = " + responsible + "\nplace = " +  place + "\ncondition = " + condition);
+                String responsible = params [7];
+                String address = params [8];
+                String description = params [9];
+                //Log.d("Value",  "id = " + id + "\nname = " + name + "\ninventory_num = " + inventory_num + "\nbarcode = " + barcode + "\nresponsible = " + responsible + "\nplace = " +  place + "\ncondition = " + condition);
                 URL url = new URL(saveEquip_url);
                 HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
                 httpURLConnection.setRequestMethod("POST");
@@ -202,9 +204,90 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 String post_data = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8") + "&"
                         + URLEncoder.encode("name", "UTF-8") + "=" + URLEncoder.encode(name, "UTF-8") + "&"
                         + URLEncoder.encode("inventory_num", "UTF-8") + "=" + URLEncoder.encode(inventory_num, "UTF-8") + "&"
-                        + URLEncoder.encode("responsible", "UTF-8") + "=" + URLEncoder.encode(responsible, "UTF-8") + "&"
-                        + URLEncoder.encode("place", "UTF-8") + "=" + URLEncoder.encode(place, "UTF-8")+ "&"
-                        + URLEncoder.encode("condition", "UTF-8") + "=" + URLEncoder.encode(condition, "UTF-8");;
+                        + URLEncoder.encode("barcode", "UTF-8") + "=" + URLEncoder.encode(barcode, "UTF-8") + "&"
+                        + URLEncoder.encode("category", "UTF-8") + "=" + URLEncoder.encode(category, "UTF-8")+ "&"
+                        + URLEncoder.encode("responsible", "UTF-8") + "=" + URLEncoder.encode(responsible, "UTF-8")+ "&"
+                        + URLEncoder.encode("address", "UTF-8") + "=" + URLEncoder.encode(address, "UTF-8")+ "&"
+                        + URLEncoder.encode("condition", "UTF-8") + "=" + URLEncoder.encode(condition, "UTF-8")+ "&"
+                        + URLEncoder.encode("description", "UTF-8") + "=" + URLEncoder.encode(description, "UTF-8");
+                bufferedWriter.write(post_data);
+                bufferedWriter.flush();
+                bufferedWriter.close();
+                outputStream.close();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));//,  "iso-8859-1"));
+                String result = "";
+                String line = "";
+                while ((line = bufferedReader.readLine()) != null){
+                    result += line;
+                }
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return result;
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        else if (type.equals("addNewInventory")){
+            try {
+                String name = params[1];
+                String inventory_num = params[2];
+                String barcode = params [3];
+                String category = params[4];
+                String condition = params[5];
+                String responsible = params [6];
+                String address = params [7];
+                String description = params [8];
+                URL url = new URL(addNewInventory_url);
+                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.setDoInput(true);
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+                String post_data = URLEncoder.encode("name", "UTF-8") + "=" + URLEncoder.encode(name, "UTF-8") + "&"
+                        + URLEncoder.encode("inventory_num", "UTF-8") + "=" + URLEncoder.encode(inventory_num, "UTF-8") + "&"
+                        + URLEncoder.encode("barcode", "UTF-8") + "=" + URLEncoder.encode(barcode, "UTF-8") + "&"
+                        + URLEncoder.encode("category", "UTF-8") + "=" + URLEncoder.encode(category, "UTF-8")+ "&"
+                        + URLEncoder.encode("responsible", "UTF-8") + "=" + URLEncoder.encode(responsible, "UTF-8")+ "&"
+                        + URLEncoder.encode("address", "UTF-8") + "=" + URLEncoder.encode(address, "UTF-8")+ "&"
+                        + URLEncoder.encode("condition", "UTF-8") + "=" + URLEncoder.encode(condition, "UTF-8")+ "&"
+                        + URLEncoder.encode("description", "UTF-8") + "=" + URLEncoder.encode(description, "UTF-8");
+                bufferedWriter.write(post_data);
+                bufferedWriter.flush();
+                bufferedWriter.close();
+                outputStream.close();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));//,  "iso-8859-1"));
+                String result = "";
+                String line = "";
+                while ((line = bufferedReader.readLine()) != null){
+                    result += line;
+                }
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return result;
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        else if (type.equals("removeInventory")){
+            try {
+                String id = params[1];
+                URL url = new URL(removeInventory_url);
+                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.setDoInput(true);
+                OutputStream outputStream = httpURLConnection.getOutputStream();
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+                String post_data = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8");
                 bufferedWriter.write(post_data);
                 bufferedWriter.flush();
                 bufferedWriter.close();
@@ -391,48 +474,6 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 e.printStackTrace();
             }
         }
-        else if (type.equals("addNewInventory")){
-            try {
-                String name = params[1];
-                String inventory_num = params[2];
-                String category = params[3];
-                String responsible = params [4];
-                String address = params [5];
-                String condition = params[6];
-                URL url = new URL(addNewInventory_url);
-                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setDoOutput(true);
-                httpURLConnection.setDoInput(true);
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-                String post_data = URLEncoder.encode("name", "UTF-8") + "=" + URLEncoder.encode(name, "UTF-8") + "&"
-                        + URLEncoder.encode("inventory_num", "UTF-8") + "=" + URLEncoder.encode(inventory_num, "UTF-8") + "&"
-                        + URLEncoder.encode("category", "UTF-8") + "=" + URLEncoder.encode(category, "UTF-8")+ "&"
-                        + URLEncoder.encode("responsible", "UTF-8") + "=" + URLEncoder.encode(responsible, "UTF-8")+ "&"
-                        + URLEncoder.encode("address", "UTF-8") + "=" + URLEncoder.encode(address, "UTF-8")+ "&"
-                        + URLEncoder.encode("condition", "UTF-8") + "=" + URLEncoder.encode(condition, "UTF-8");
-                bufferedWriter.write(post_data);
-                bufferedWriter.flush();
-                bufferedWriter.close();
-                outputStream.close();
-                InputStream inputStream = httpURLConnection.getInputStream();
-                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));//,  "iso-8859-1"));
-                String result = "";
-                String line = "";
-                while ((line = bufferedReader.readLine()) != null){
-                    result += line;
-                }
-                bufferedReader.close();
-                inputStream.close();
-                httpURLConnection.disconnect();
-                return result;
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e){
-                e.printStackTrace();
-            }
-        }
         else if (type.equals("saveInventory")){
             try {
                 String id = params[1];
@@ -477,38 +518,7 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 e.printStackTrace();
             }
         }
-        else if (type.equals("removeInventory")){
-            try {
-                String id = params[1];
-                URL url = new URL(removeInventory_url);
-                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setDoOutput(true);
-                httpURLConnection.setDoInput(true);
-                OutputStream outputStream = httpURLConnection.getOutputStream();
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-                String post_data = URLEncoder.encode("id", "UTF-8") + "=" + URLEncoder.encode(id, "UTF-8");
-                bufferedWriter.write(post_data);
-                bufferedWriter.flush();
-                bufferedWriter.close();
-                outputStream.close();
-                InputStream inputStream = httpURLConnection.getInputStream();
-                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));//,  "iso-8859-1"));
-                String result = "";
-                String line = "";
-                while ((line = bufferedReader.readLine()) != null){
-                    result += line;
-                }
-                bufferedReader.close();
-                inputStream.close();
-                httpURLConnection.disconnect();
-                return result;
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e){
-                e.printStackTrace();
-            }
-        }
+
         */
         return null;
     }

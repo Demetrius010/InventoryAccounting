@@ -3,10 +3,11 @@ package com.company.inventoryaccounting;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.widget.ListPopupWindow;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -21,12 +22,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class ChangeInstrument extends AppCompatActivity implements BackgroundWorkerResponse {
+public class ChangeInstrument extends AppCompatActivity implements BackgroundWorkerResponse, View.OnTouchListener,
+        AdapterView.OnItemClickListener {
     String instrumentId;
     String responsibleData;
     String addressesData;
 
-    EditText etEquipName, etEquipInventoryNum;
+    EditText etEquipName, etEquipInventoryNum, etTest;
     Spinner spinPlace, spinCondition, spinResponsible;
 
     ArrayAdapter<String> dataAdapterForConditions;
@@ -34,6 +36,9 @@ public class ChangeInstrument extends AppCompatActivity implements BackgroundWor
     ArrayAdapter<String> responsibleDataAdapter;
     Map<String, String> allAddresses;
     ArrayAdapter<String> addressesDataAdapter;
+
+    private ListPopupWindow lpw;
+    private String[] list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +49,7 @@ public class ChangeInstrument extends AppCompatActivity implements BackgroundWor
         //Log.d("Value", "instrumentId = " + instrumentId);
         etEquipName = (EditText) findViewById(R.id.etEquipName);
         etEquipInventoryNum = (EditText) findViewById(R.id.etEquipInventoryNum);
+        etTest = (EditText) findViewById(R.id.categorySpinEt);
         spinPlace = (Spinner)findViewById(R.id.spinPlace);
         spinCondition = (Spinner)findViewById(R.id.spinCondition);
         spinResponsible = (Spinner)findViewById(R.id.spinResponsible);
@@ -55,7 +61,39 @@ public class ChangeInstrument extends AppCompatActivity implements BackgroundWor
         fillSpinAddresses();
         String type = "getEquipByID";
         new BackgroundWorker(this, this).execute(type, instrumentId);
+
+        etTest.setOnTouchListener(this);
+
+        list = new String[] { "item1", "item2", "item3", "item4" };
+        lpw = new ListPopupWindow(this);
+        lpw.setAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, list));
+        lpw.setAnchorView(etTest);
+        lpw.setModal(true);
+        lpw.setOnItemClickListener(this);
     }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String item = list[position];
+        etTest.setText(item);
+        lpw.dismiss();
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        final int DRAWABLE_RIGHT = 2;
+
+        if (event.getAction() == MotionEvent.ACTION_UP) {// Check if touch point is in the area of the right button
+            if (event.getX() >= (v.getWidth() - ((EditText) v)
+                    .getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                lpw.show();// your action here
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public void fillSpinCondition() {
         List<String> allConditions =  new ArrayList<String>();

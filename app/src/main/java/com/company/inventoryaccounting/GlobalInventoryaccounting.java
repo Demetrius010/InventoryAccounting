@@ -2,6 +2,8 @@ package com.company.inventoryaccounting;
 
 import android.app.Application;
 
+import java.util.ArrayList;
+
 public class GlobalInventoryaccounting extends Application {
 
     private Boolean adminFlag;
@@ -36,6 +38,13 @@ public class GlobalInventoryaccounting extends Application {
         this.addressesData = data;
     }
 
+    private ArrayList<String> allCategoryList = new ArrayList<String>();;
+    public ArrayList<String> getAllCategoryList() {
+        return allCategoryList;
+    }
+    public void setAllCategoryList(ArrayList<String> newList) {
+        this.allCategoryList = newList;
+    }
 
 }
 /*

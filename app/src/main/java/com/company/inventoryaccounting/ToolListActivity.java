@@ -358,7 +358,7 @@ public class ToolListActivity extends AppCompatActivity{// implements Background
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(".ChangeInstrument");
+                Intent intent = new Intent(".ChangeInventoryActivity");
                 intent.putExtra("idInstrument", instrumentID); //in new act in onCreate() {.... variable = getIntent().getExtras().getString("NAME")}
                 startActivity(intent);
             }
@@ -432,6 +432,7 @@ public class ToolListActivity extends AppCompatActivity{// implements Background
                     allCategories.put(instrumentID, category);
                 }
             }
+            ((GlobalInventoryaccounting)this.getApplication()).setAllCategoryList(new ArrayList<String>(allCategories.values()));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -445,7 +446,7 @@ public class ToolListActivity extends AppCompatActivity{// implements Background
             for(int i = 0; i < jsonArray.length(); i++){
                 JSONObject jsonObj = jsonArray.getJSONObject(i);
                 reponsibleId = jsonObj.getString("id");
-                responsibleFullName = jsonObj.getString("full_name");;
+                responsibleFullName = jsonObj.getString("full_name");
                 allResponsible.put(reponsibleId, responsibleFullName);
                 //Log.d("Value", "reponsibleId = " + reponsibleId + " responsibleFullName = " + allResponsible.get(reponsibleId));
             }
@@ -463,7 +464,7 @@ public class ToolListActivity extends AppCompatActivity{// implements Background
             for(int i = 0; i < jsonArray.length(); i++){
                 JSONObject jsonObj = jsonArray.getJSONObject(i);
                 addressId = jsonObj.getString("id");
-                shortAddress = jsonObj.getString("short_address");;
+                shortAddress = jsonObj.getString("short_address");
                 allAddresses.put(addressId, shortAddress);
                 //Log.d("Value", "reponsibleId = " + reponsibleId + " responsibleFullName = " + allResponsible.get(reponsibleId));
             }
