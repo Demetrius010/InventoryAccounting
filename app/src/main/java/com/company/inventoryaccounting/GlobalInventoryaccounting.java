@@ -46,6 +46,21 @@ public class GlobalInventoryaccounting extends Application {
         this.allCategoryList = newList;
     }
 
+    private ArrayList<String> allPositionList = new ArrayList<String>();;
+    public ArrayList<String> getAllPositionList() {
+        return allPositionList;
+    }
+    public void setAllPositionList(ArrayList<String> newList) {
+        this.allPositionList = newList;
+    }
+
+    private ArrayList<String> allTeamList = new ArrayList<String>();;
+    public ArrayList<String> getAllTeamList() {
+        return allTeamList;
+    }
+    public void setAllTeamList(ArrayList<String> newList) {
+        this.allTeamList = newList;
+}
 }
 /*
 * // set

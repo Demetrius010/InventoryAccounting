@@ -194,7 +194,7 @@ public class ChangeInstrument extends AppCompatActivity implements BackgroundWor
                 e.printStackTrace();
             }
         }
-        if (typeFinishedProc.equals("saveEquip")) {
+        else if (typeFinishedProc.equals("saveEquip")) {
             if(output.equals("Update successful")) {
                 Toast.makeText(this, "Изменения сохранены", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(".MainMenuActivity");

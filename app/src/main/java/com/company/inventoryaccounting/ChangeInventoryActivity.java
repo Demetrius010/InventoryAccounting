@@ -94,7 +94,6 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
         if(((GlobalInventoryaccounting) this.getApplication()).isAdmin())
         {
             fillEtSpinCategory();
-
         }
         else {
             spnCurrentOrNewEqup.setEnabled(false);
@@ -124,42 +123,6 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
             etCategory.setClickable(false);
             etCategory.setTextColor(Color.DKGRAY);
         }
-       /* spnInventoryId.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                if (spnInventoryId.getSelectedItem().equals("Новый инвентарь")) {
-                    btnAddInventory.setEnabled(true);
-                    btnAddInventory.getBackground().setAlpha(255);
-                    btnChangeInventory.setEnabled(false);
-                    btnChangeInventory.getBackground().setAlpha(100);
-                    btnRemoveInventory.setEnabled(false);
-                    btnRemoveInventory.getBackground().setAlpha(100);
-
-                }
-                else {
-
-
-                    btnChangeInventory.setEnabled(true);
-                    btnChangeInventory.getBackground().setAlpha(255);
-
-                    currentID = getKeyByValue(allEquipmentsName, spnInventoryId.getSelectedItem().toString());
-                    actvName.setText(allEquipmentsName.get(currentID));
-                    actvName.setSelection(actvName.getText().length());
-                    actvInvNum.setText(allInvNum.get(currentID));
-                    actvInvNum.setSelection(actvInvNum.getText().length());
-                    actvInvCategory.setText(allInvCategory.get(currentID));
-                    actvInvCategory.setSelection(actvInvCategory.getText().length());
-                    spnCondition.setSelection(Integer.parseInt(getKeyByValue(allConditions, allInvCondition.get(currentID))));
-                    spnInvResponsible.setSelection(responsibleDataAdapter.getPosition(allResponsible.get(allInvResponsible.get(currentID))));
-                    spnInvPlace.setSelection(addressesDataAdapter.getPosition(allAddresses.get(allInvAddresses.get(currentID))));
-                }
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-            }
-        });*/
     }
 
 
@@ -304,6 +267,12 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
         }
     }
 
+    private void getFreshData(){
+        new BackgroundWorker(this, this).execute("getEquip");
+        new BackgroundWorker(this, this).execute("getStaff");
+        new BackgroundWorker(this, this).execute("getAddresses");
+    }
+
     public void processFinish(String output, String typeFinishedProc) {
         if (typeFinishedProc.equals("getEquipByID")) {
             try {
@@ -334,7 +303,8 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
         {
             if(output.equals("Update successful")) {
                 Toast.makeText(this, "Добавлен новый инвентарь", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(".MainMenuActivity");
+                getFreshData();
+                Intent intent = new Intent(".ToolListActivity");
                 startActivity(intent);
             }
         }
@@ -342,72 +312,35 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
         {
             if(output.equals("Update successful")) {
                 Toast.makeText(this, "Инвентарь изменен", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(".MainMenuActivity");
+                getFreshData();
+                Intent intent = new Intent(".ToolListActivity");
                 startActivity(intent);
             }
         }
-        if(typeFinishedProc.equals("removeInventory"))
+        else if(typeFinishedProc.equals("removeInventory"))
         {
             if(output.equals("Update successful")) {
                 Toast.makeText(this, "Инвентарь удален", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(".MainMenuActivity");
+                getFreshData();
+                Intent intent = new Intent(".ToolListActivity");
                 startActivity(intent);
             }
         }
-        /*if(typeFinishedProc.equals("getAllEquip"))
-        {
-            try {
-                String id, name, inventory_num, category, condition, responsible, address;
-                allEquipmentsName = new HashMap<String, String>();
-                allInvNum = new HashMap<String, String>();
-                allInvCategory = new HashMap<String, String>();
-                allInvCondition = new HashMap<String, String>();
-                allInvResponsible = new HashMap<String, String>();
-                allInvAddresses = new HashMap<String, String>();
-                List<String> uniqueInvCategory = new ArrayList<String>();
-                JSONObject jsonObject = new JSONObject(output);
-                JSONArray jsonArray = jsonObject.getJSONArray("server_response");
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonObj = jsonArray.getJSONObject(i);
-                    id =  jsonObj.getString("id");
-                    name = jsonObj.getString("name");
-                    allEquipmentsName.put(id, name);
-                    inventory_num = jsonObj.getString("inventory_num");
-                    allInvNum.put(id, inventory_num);
-                    category = jsonObj.getString("category");
-                    allInvCategory.put(id, category);
-                    if (!uniqueInvCategory.contains(category)) {
-                        uniqueInvCategory.add(category);
-                    }
-                    condition = jsonObj.getString("equip_condition");
-                    allInvCondition.put(id, condition);
-                    responsible = jsonObj.getString("responsible");
-                    allInvResponsible.put(id, responsible);
-                    address = jsonObj.getString("space");
-                    allInvAddresses.put(id, address);
-                }
-                ArrayAdapter<String> equipNamesDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<String>(allEquipmentsName.values()));
-                actvName.setAdapter(equipNamesDataAdapter);
-
-                ArrayAdapter<String> equipNamesSpinDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new ArrayList<String>(allEquipmentsName.values()));
-                equipNamesSpinDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                equipNamesSpinDataAdapter.insert("Новый инвентарь", 0);
-                spnInventoryId.setAdapter(equipNamesSpinDataAdapter);
-
-                ArrayAdapter<String> invNumDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<String>(allInvNum.values()));
-                actvInvNum.setAdapter(invNumDataAdapter);
-
-                ArrayAdapter<String> uniqueinvCategoryDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, uniqueInvCategory);
-                actvInvCategory.setAdapter(uniqueinvCategoryDataAdapter);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        else if (typeFinishedProc.equals("getEquip")) {
+            ((GlobalInventoryaccounting)this.getApplication()).setEquipmentData(output);
+            //Log.d("Value","EquipmentData = " + ((GlobalInventoryaccounting) this.getApplication()).getEquipmentData());
         }
-
-
-        */
+        else if(typeFinishedProc.equals("getStaff")){
+            ((GlobalInventoryaccounting)this.getApplication()).setStaffData(output);
+            //Log.d("Value","StaffData = " + ((GlobalInventoryaccounting) this.getApplication()).getStaffData());
+        }
+        else if(typeFinishedProc.equals("getAddresses")){
+            ((GlobalInventoryaccounting)this.getApplication()).setAddressesData(output);
+            //Log.d("Value","AddressesData = " + ((GlobalInventoryaccounting) this.getApplication()).getAddressesData());
+        }
     }
+
+
 
     public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
         for (Map.Entry<T, E> entry : map.entrySet()) {

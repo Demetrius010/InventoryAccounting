@@ -7,7 +7,7 @@
     tools:context=".ChangePlaceActivity">
 
     <Spinner
-        android:id="@+id/spnId"
+        android:id="@+id/spnCurrentOrNewPlace"
         android:layout_width="0dp"
         android:layout_height="35dp"
         android:layout_marginStart="8dp"
@@ -17,30 +17,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <AutoCompleteTextView
-        android:id="@+id/actvDesc"
+    <EditText
+        android:id="@+id/etShortAddress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:hint="Улица, № (Выполняемые работы)"
+        android:inputType="textNoSuggestions"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spnId" />
+        app:layout_constraintTop_toBottomOf="@+id/spnCurrentOrNewPlace" />
 
-    <AutoCompleteTextView
-        android:id="@+id/actvFullAddress"
+    <EditText
+        android:id="@+id/etFullAddress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:hint="Полный адрес объекта"
+        android:inputType="textNoSuggestions"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/actvDesc" />
+        app:layout_constraintTop_toBottomOf="@+id/etShortAddress" />
 
     <Button
         android:id="@+id/btnAddPlace"

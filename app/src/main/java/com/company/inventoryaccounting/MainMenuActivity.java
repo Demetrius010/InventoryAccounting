@@ -22,18 +22,6 @@ import java.util.Objects;
 public class MainMenuActivity extends AppCompatActivity implements BackgroundWorkerResponse {
 
     Button btnAllEquip, bntEmployee, btnPlaces;
-    //JSONObject jsonObject;
-    //JSONArray jsonArray;
-    //Map<String, String> allAddresses; //String selectedAddressId = getKeyByValue(allAddresses, spnAddress.getSelectedItem().toString());
-
-    /*public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
-        for (Map.Entry<T, E> entry : map.entrySet()) {
-            if (Objects.equals(value, entry.getValue())) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }*/
     EditText search;
 
 
@@ -44,26 +32,31 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
         btnAllEquip = (Button) findViewById(R.id.btnAllEquip);
         bntEmployee = (Button) findViewById(R.id.btnEmployee);
         btnPlaces = (Button) findViewById(R.id.btnPlaces);
+        search = findViewById(R.id.etSearchByBarcode);
+    }
 
+    @Override
+    protected void onStart() {
         new BackgroundWorker(this, this).execute("getEquip");
         new BackgroundWorker(this, this).execute("getStaff");
         new BackgroundWorker(this, this).execute("getAddresses");
-        search = findViewById(R.id.etSearchByBarcode);
-
+        super.onStart();
     }
 
     public void onAllEquipButton(View view) {
         Intent intent = new Intent(".ToolListActivity");
         startActivity(intent);
-    }
+}
 
 
     public void onEmployeeButton(View view) {
-
+        Intent intent = new Intent(".StaffListActivity");
+        startActivity(intent);
     }
 
     public void onPlacesButton(View view) {
-
+        Intent intent = new Intent(".PlaceListActivity");
+        startActivity(intent);
     }
 
 
@@ -84,46 +77,3 @@ public class MainMenuActivity extends AppCompatActivity implements BackgroundWor
     }
 }
 
-        /*if(typeFinishedProc.equals("getAddresses"))
-        {
-            ((GlobalInventoryaccounting)this.getApplication()).setAddressesData(output);
-            try {
-                String addressId, address;
-                //List<String> allAddresses = new ArrayList<String>();
-                allAddresses = new HashMap<String, String>();//map.put("dog", "type of animal");//System.out.println(map.get("dog"));
-                jsonObject = new JSONObject(output);
-                jsonArray = jsonObject.getJSONArray("server_response");
-                for(int i = 0; i < jsonArray.length(); i++){
-                    JSONObject jsonObj = jsonArray.getJSONObject(i);
-                    address = jsonObj.getString("short_address");
-                    //allAddresses.add(address);
-                    addressId = jsonObj.getString("id");
-                    allAddresses.put(addressId, address);
-                    //Log.d("Value", "addressId = " + addressId + " address = " + allAddresses.get(addressId));
-                }
-                //ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allAddresses);
-                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new ArrayList<String>(allAddresses.values()));
-                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                //spnAddress.setAdapter(dataAdapter);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-       */
-
-
-       /*private void ifAdmin(){
-        if (((GlobalInventoryaccounting) this.getApplication()).isAdmin())
-        {
-            //Log.d("Value","admin = " + ((GlobalInventoryaccounting) this.getApplication()).isAdmin());
-            bntObjects.setVisibility(View.VISIBLE);
-        }
-    }*/
-
-
-       /*
-       *                 Intent intent = new Intent(".ToolListActivity");
-                intent.putExtra("jsonArray", jsonArray.toString()); //in new act in onCreate() {.... variable = getIntent().getExtras().getString("NAME")}
-                startActivity(intent);
-       *
-       * */

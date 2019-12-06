@@ -68,21 +68,14 @@ public class ToolListActivity extends AppCompatActivity{// implements Background
         myLinearLayout = (LinearLayout) findViewById(R.id.linLayout);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        fillAddressesDictionary();
-        fillCategoryDictionary();
-        fillResponsibleDictionary();
-        fillActWithItems();
-
-        /*jsonString = getIntent().getStringExtra("jsonArray");
-        spnCategory = (Spinner)findViewById(R.id.spnCategory);
-        spnCategory.setAdapter(null);
-        spnCategory.setOnItemSelectedListener(listener);*/
    }
 
     @Override
     protected void onStart() {
-        super.onStart();
+        fillAddressesDictionary();
+        fillCategoryDictionary();
+        fillResponsibleDictionary();
+        fillActWithItems();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
@@ -100,6 +93,7 @@ public class ToolListActivity extends AppCompatActivity{// implements Background
                 return false;
             }
         });
+        super.onStart();
     }
 
     @Override

@@ -3,34 +3,27 @@ package com.company.inventoryaccounting;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class ChangePlaceActivity extends AppCompatActivity implements BackgroundWorkerResponse{
     Button btnAddPlace, btnChangePlace, btnRemovePlace;
-    Spinner spnId;
-    AutoCompleteTextView actvDesc, actvFullAddress;
-    String addressesData;
-    Map<String, String> allShortAddresses, allFullAddresses;
-
+    Spinner spnCurrentOrNewPlace;
+    EditText etShortAddress, etFullAddress;
+    String placeID, shortAddress, fullAddress;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,105 +31,90 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
         btnAddPlace = (Button)findViewById(R.id.btnAddPlace);
         btnChangePlace = (Button)findViewById(R.id.btnChangePlace);
         btnRemovePlace = (Button)findViewById(R.id.btnRemovePlace);
-        spnId = (Spinner)findViewById(R.id.spnId);
+        spnCurrentOrNewPlace = (Spinner)findViewById(R.id.spnCurrentOrNewPlace);
+        etShortAddress = findViewById(R.id.etShortAddress);
+        etFullAddress = findViewById(R.id.etFullAddress);
+        placeID = getIntent().getExtras().getString("employeeID");
+        shortAddress = getIntent().getExtras().getString("shortAddress");
+        fullAddress = getIntent().getExtras().getString("fullAddress");
+        fillSpnCurrentOrNewPlace();
+        fillActvByInfo();
+    }
 
-        addressesData = ((GlobalInventoryaccounting) this.getApplication()).getAddressesData();
-        actvDesc = findViewById(R.id.actvDesc);
-        actvFullAddress = findViewById(R.id.actvFullAddress);
-        fillActvDesc();
+    private void fillSpnCurrentOrNewPlace(){
+        List<String> spnCurrentOrNewPlaceArray =  new ArrayList<String>();
+        spnCurrentOrNewPlaceArray.add(shortAddress);
+        spnCurrentOrNewPlaceArray.add("Новый объект");
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, spnCurrentOrNewPlaceArray);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spnCurrentOrNewPlace.setAdapter(adapter);
         ifNewObjectSelected();
     }
 
     public void ifNewObjectSelected(){
-        spnId.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spnCurrentOrNewPlace.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                if (spnId.getSelectedItem().equals("Новый объект")) {
+                if (spnCurrentOrNewPlace.getSelectedItem().equals("Новый объект")) {
                     btnAddPlace.setEnabled(true);
                     btnAddPlace.getBackground().setAlpha(255);
                     btnChangePlace.setEnabled(false);
                     btnChangePlace.getBackground().setAlpha(100);
                     btnRemovePlace.setEnabled(false);
                     btnRemovePlace.getBackground().setAlpha(100);
-
                 }
                 else {
+                    fillActvByInfo();
                     btnAddPlace.setEnabled(false);
                     btnAddPlace.getBackground().setAlpha(100);
                     btnChangePlace.setEnabled(true);
                     btnChangePlace.getBackground().setAlpha(255);
                     btnRemovePlace.setEnabled(true);
                     btnRemovePlace.getBackground().setAlpha(255);
-                    String currentKey = getKeyByValue(allShortAddresses, spnId.getSelectedItem().toString());
-                    actvDesc.setText(allShortAddresses.get(currentKey));
-                    actvDesc.setSelection(actvDesc.getText().length());
-                    actvFullAddress.setText(allFullAddresses.get(currentKey));
-                    actvFullAddress.setSelection(actvFullAddress.getText().length());
                 }
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-            }
+            public void onNothingSelected(AdapterView<?> parentView) { }
         });
     }
 
-    public void fillActvDesc() {
-        try {
-            String addressId, shortAddress, fullAddress;
-            allShortAddresses = new HashMap<String, String>();
-            allFullAddresses = new HashMap<String, String>();
-            JSONObject jsonObject = new JSONObject(addressesData);
-            JSONArray jsonArray = jsonObject.getJSONArray("server_response");
-            for(int i = 0; i < jsonArray.length(); i++){
-                JSONObject jsonObj = jsonArray.getJSONObject(i);
-                addressId = jsonObj.getString("id");
-                shortAddress = jsonObj.getString("short_address");
-                allShortAddresses.put(addressId, shortAddress);
-                fullAddress = jsonObj.getString("full_address");
-                allFullAddresses.put(addressId, fullAddress);
-
-            }
-            ArrayAdapter<String> shortAddressesDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<String>(allShortAddresses.values()));
-            actvDesc.setAdapter(shortAddressesDataAdapter);
-
-            ArrayAdapter<String> shortAddressesSpinDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new ArrayList<String>(allShortAddresses.values()));
-            shortAddressesSpinDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            shortAddressesSpinDataAdapter.insert("Новый объект", 0);
-            spnId.setAdapter(shortAddressesSpinDataAdapter);
-
-            ArrayAdapter<String> fullAddressesDataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<String>(allFullAddresses.values()));
-            actvFullAddress.setAdapter(fullAddressesDataAdapter);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    public void fillActvByInfo() {
+        etShortAddress.setText(shortAddress);
+        etFullAddress.setText(fullAddress);
     }
 
     public void onAddBtn(View view)
     {
         String type = "addNewPlace";
-        new BackgroundWorker(this, this).execute(type, actvDesc.getText().toString(), actvFullAddress.getText().toString());
+        new BackgroundWorker(this, this).execute(type, etShortAddress.getText().toString(), etFullAddress.getText().toString());
     }
 
     public void onChangeBtn(View view)
     {
         String type = "changePlace";
-        new BackgroundWorker(this, this).execute(type, getKeyByValue(allShortAddresses, spnId.getSelectedItem().toString()), actvDesc.getText().toString(), actvFullAddress.getText().toString());
+        new BackgroundWorker(this, this).execute(type, placeID, etShortAddress.getText().toString(), etFullAddress.getText().toString());
     }
 
     public void onRemoveBtn(View view)
     {
         String type = "removePlace";
-        new BackgroundWorker(this, this).execute(type, getKeyByValue(allShortAddresses, spnId.getSelectedItem().toString()));
+        new BackgroundWorker(this, this).execute(type, placeID);
     }
 
+    private void getFreshData(){
+        new BackgroundWorker(this, this).execute("getEquip");
+        new BackgroundWorker(this, this).execute("getStaff");
+        new BackgroundWorker(this, this).execute("getAddresses");
+    }
 
     public void processFinish(String output, String typeFinishedProc) {
         if(typeFinishedProc.equals("addNewPlace"))
         {
             if(output.equals("Update successful")) {
                 Toast.makeText(this, "Добавлен новый объект", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(".MainMenuActivity");
+                getFreshData();
+                Intent intent = new Intent(".PlaceListActivity");
                 startActivity(intent);
             }
         }
@@ -144,7 +122,8 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
         {
             if(output.equals("Update successful")) {
                 Toast.makeText(this, "Объект изменен", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(".MainMenuActivity");
+                getFreshData();
+                Intent intent = new Intent(".PlaceListActivity");
                 startActivity(intent);
             }
         }
@@ -152,7 +131,8 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
         {
             if(output.equals("Update successful")) {
                 Toast.makeText(this, "Объект удален", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(".MainMenuActivity");
+                getFreshData();
+                Intent intent = new Intent(".PlaceListActivity");
                 startActivity(intent);
             }
             else {
@@ -162,15 +142,17 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
                 toast.show();
             }
         }
-    }
-
-
-    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
-        for (Map.Entry<T, E> entry : map.entrySet()) {
-            if (Objects.equals(value, entry.getValue())) {
-                return entry.getKey();
-            }
+        else if (typeFinishedProc.equals("getEquip")) {
+            ((GlobalInventoryaccounting)this.getApplication()).setEquipmentData(output);
+            //Log.d("Value","EquipmentData = " + ((GlobalInventoryaccounting) this.getApplication()).getEquipmentData());
         }
-        return null;
+        else if(typeFinishedProc.equals("getStaff")){
+            ((GlobalInventoryaccounting)this.getApplication()).setStaffData(output);
+            //Log.d("Value","StaffData = " + ((GlobalInventoryaccounting) this.getApplication()).getStaffData());
+        }
+        else if(typeFinishedProc.equals("getAddresses")){
+            ((GlobalInventoryaccounting)this.getApplication()).setAddressesData(output);
+            //Log.d("Value","AddressesData = " + ((GlobalInventoryaccounting) this.getApplication()).getAddressesData());
+        }
     }
 }
