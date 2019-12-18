@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PlaceListActivity">
+
+    <include
+        android:id="@+id/place_tool_bar"
+        layout="@layout/place_tool_bar" />
+
+    <ScrollView
+        android:id="@+id/placeScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/place_tool_bar">
+
+        <LinearLayout
+            android:id="@+id/placeLinLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:visibility="visible"></LinearLayout>
+    </ScrollView>
+
+</android.support.constraint.ConstraintLayout>

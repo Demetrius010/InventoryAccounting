@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar">
+
+    <item
+        android:id="@+id/sortBtn"
+        android:icon="@drawable/sorting"
+        android:title="sorting"
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <group android:id="@+id/sortingGroup"
+                android:checkableBehavior="single">
+                <item android:id="@+id/ascendingSort"
+                    android:title="По порядку"
+                    android:icon="@drawable/ic_arrow_downward"
+                    android:checked="true" />
+                <item android:id="@+id/descendingSort"
+                    android:title="По порядку"
+                    android:icon="@drawable/ic_arrow_upward"/>
+                <item android:id="@+id/alphabetSort"
+                    android:title="По названию"
+                    android:icon="@drawable/ic_arrow_downward"/>
+                <item android:id="@+id/reverseAlphabetSort"
+                    android:title="По названию"
+                    android:icon="@drawable/ic_arrow_upward" />
+            </group>
+        </menu>
+    </item>
+
+
+    <item
+        android:id="@+id/filterBtn"
+        android:icon="@drawable/filter"
+        android:title="filters"
+        app:showAsAction="always">
+
+        <menu>
+            <item android:id="@+id/placeFilter"
+                android:title="Помещение">
+                <menu android:id="@+id/placeFilterMenu">
+                    <item android:id="@+id/placeNone"
+                        android:title="Не выбрано"
+                        android:checkable="true"
+                        android:checked="true"/>
+                </menu>
+            </item>
+
+            <item android:id="@+id/categoryFilter"
+                android:title="Категория">
+                <menu>
+                    <item android:id="@+id/categoryNone"
+                        android:title="Не выбрано"
+                        android:checkable="true"
+                        android:checked="true"/>
+                </menu>
+            </item>
+
+            <item android:id="@+id/conditionFilter"
+                android:title="Состояние">
+                <menu>
+                    <item android:id="@+id/conditionNone"
+                        android:title="Не выбрано"
+                        android:checkable="true"
+                        android:checked="true"/>
+                    <item android:id="@+id/conditionWork"
+                        android:title="Работает"
+                        android:checkable="true"/>
+                    <item android:id="@+id/conditionRepair"
+                        android:title="В ремонте"
+                        android:checkable="true"/>
+                    <item android:id="@+id/conditionDecommiss"
+                        android:title="Списан"
+                        android:checkable="true"/>
+                </menu>
+            </item>
+
+            <item android:id="@+id/employeeFilter"
+                android:title="Сотрудник">
+                <menu>
+                    <item android:id="@+id/employeeNone"
+                        android:title="Не выбрано"
+                        android:checkable="true"
+                        android:checked="true"/>
+                </menu>
+            </item>
+        </menu>
+    </item>
+
+
+</menu>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/place_tool_bar">
+
+    <item
+        android:id="@+id/sortPlaceBtn"
+        android:icon="@drawable/sorting"
+        android:title="sorting"
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <group android:id="@+id/placeSortingGroup"
+                android:checkableBehavior="single">
+                <item android:id="@+id/placeAscendingSort"
+                    android:title="По порядку"
+                    android:icon="@drawable/ic_arrow_downward"
+                    android:checked="true" />
+                <item android:id="@+id/placeDescendingSort"
+                    android:title="По порядку"
+                    android:icon="@drawable/ic_arrow_upward"/>
+                <item android:id="@+id/placeAlphabetSort"
+                    android:title="По адресу"
+                    android:icon="@drawable/ic_arrow_downward"/>
+                <item android:id="@+id/placeReverseAlphabetSort"
+                    android:title="По адресу"
+                    android:icon="@drawable/ic_arrow_upward" />
+            </group>
+        </menu>
+    </item>
+
+</menu>

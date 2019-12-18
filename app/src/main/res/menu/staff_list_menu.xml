@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/staff_tool_bar">
+
+    <item
+        android:id="@+id/sortStaffBtn"
+        android:icon="@drawable/sorting"
+        android:title="sorting"
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <group android:id="@+id/staffSortingGroup"
+                android:checkableBehavior="single">
+                <item android:id="@+id/staffAscendingSort"
+                    android:title="По порядку"
+                    android:icon="@drawable/ic_arrow_downward"
+                    android:checked="true" />
+                <item android:id="@+id/staffDescendingSort"
+                    android:title="По порядку"
+                    android:icon="@drawable/ic_arrow_upward"/>
+                <item android:id="@+id/staffAlphabetSort"
+                    android:title="По ФИО"
+                    android:icon="@drawable/ic_arrow_downward"/>
+                <item android:id="@+id/staffReverseAlphabetSort"
+                    android:title="По ФИО"
+                    android:icon="@drawable/ic_arrow_upward" />
+            </group>
+        </menu>
+    </item>
+
+
+    <item
+        android:id="@+id/staffFilterBtn"
+        android:icon="@drawable/filter"
+        android:title="filters"
+        app:showAsAction="always">
+
+        <menu>
+            <item android:id="@+id/positionFilter"
+                android:title="Должность">
+                <menu android:id="@+id/positionFilterMenu">
+                    <item android:id="@+id/positionNone"
+                        android:title="Не выбрано"
+                        android:checkable="true"
+                        android:checked="true"/>
+                </menu>
+            </item>
+
+            <item android:id="@+id/teamFilter"
+                android:title="Бригада">
+                <menu>
+                    <item android:id="@+id/teamNone"
+                        android:title="Не выбрано"
+                        android:checkable="true"
+                        android:checked="true"/>
+                </menu>
+            </item>
+        </menu>
+    </item>
+
+</menu>
