@@ -3,27 +3,54 @@
     package="com.company.inventoryaccounting">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-feature android:name="android.hardware.camera.flash" />
+
 
     <application
         android:name=".GlobalInventoryaccounting"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.google.android.actions"
+            android:resource="@xml/network_security_config" />
+
         <activity
             android:name=".MainMenuActivity"
-            android:label="Учёт инвентаря">
+            android:configChanges="orientation"
+            android:label="Учёт инвентаря"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name=".MainMenuActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".ScannerActivity"
+            android:configChanges="orientation"
+            android:launchMode="singleTask"
+            android:noHistory="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name=".ScannerActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ToolListActivity"
+            android:configChanges="orientation"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name=".ToolListActivity" />
@@ -33,7 +60,9 @@
         </activity>
         <activity
             android:name=".PlaceListActivity"
+            android:configChanges="orientation"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name=".PlaceListActivity" />
@@ -43,7 +72,9 @@
         </activity>
         <activity
             android:name=".StaffListActivity"
+            android:configChanges="orientation"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name=".StaffListActivity" />
@@ -53,7 +84,10 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:label="Учёт инвентаря">
+            android:configChanges="orientation"
+            android:label="Учёт инвентаря"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -62,7 +96,9 @@
         </activity>
         <activity
             android:name=".ChangeInstrument"
-            android:label="Учёт инвентаря">
+            android:configChanges="orientation"
+            android:label="Учёт инвентаря"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name=".ChangeInstrument" />
 
@@ -71,15 +107,22 @@
         </activity>
         <activity
             android:name=".ChangePlaceActivity"
-            android:label="Учёт инвентаря">
+            android:configChanges="orientation"
+            android:label="Учёт инвентаря"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name=".ChangePlaceActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ChangeEmployeeActivity"
-            android:label="Учёт инвентаря">
+        <activity
+            android:name=".ChangeEmployeeActivity"
+            android:configChanges="orientation"
+            android:label="Учёт инвентаря"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name=".ChangeEmployeeActivity" />
 
@@ -88,8 +131,11 @@
         </activity>
         <activity
             android:name=".ChangeInventoryActivity"
+            android:configChanges="orientation"
+            android:label="Учёт инвентаря"
             android:launchMode="singleTask"
-            android:label="Учёт инвентаря">
+            android:noHistory="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name=".ChangeInventoryActivity" />
 

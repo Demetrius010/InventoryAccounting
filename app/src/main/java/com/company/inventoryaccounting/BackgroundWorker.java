@@ -35,7 +35,7 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
     @Override
     protected String doInBackground(String... params) {
         type = params[0];
-        String ip = "192.168.1.2:8080";//"37.20.171.61:8080";//
+        String ip = "90.188.238.213:8080";//"192.168.1.2:8080";//
         String login_url = "http://"+ip+"/login.php";
         String getEquip_url = "http://"+ip+"/getEquip.php";
         String getStaff_url = "http://"+ip+"/getStaff.php";
@@ -56,6 +56,7 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
         if(type.equals("login")){
             try {
                 String phone = params[1];
+                String jsonString;
                 URL url = new URL(login_url);
                 HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
                 httpURLConnection.setRequestMethod("POST");
@@ -69,16 +70,15 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 bufferedWriter.close();
                 outputStream.close();
                 InputStream inputStream = httpURLConnection.getInputStream();
-                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream,  "iso-8859-1"));
-                String result = "";
-                String line = "";
-                while ((line = bufferedReader.readLine()) != null){
-                    result += line;
+                BufferedReader bufferedReader  = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((jsonString = bufferedReader.readLine()) != null){
+                    stringBuilder.append(jsonString+"\n");
                 }
                 bufferedReader.close();
                 inputStream.close();
                 httpURLConnection.disconnect();
-                return result;
+                return stringBuilder.toString().trim();
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e){
@@ -157,7 +157,6 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
                 String jsonString;
                 URL url = new URL(equipByID_url);
                 HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setDoOutput(true);
                 httpURLConnection.setDoInput(true);

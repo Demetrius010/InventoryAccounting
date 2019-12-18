@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +22,7 @@ import java.util.Objects;
 public class ChangePlaceActivity extends AppCompatActivity implements BackgroundWorkerResponse{
     Button btnAddPlace, btnChangePlace, btnRemovePlace;
     Spinner spnCurrentOrNewPlace;
+    ProgressBar progressBar;
     EditText etShortAddress, etFullAddress;
     String placeID, shortAddress, fullAddress;
     
@@ -34,6 +36,7 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
         spnCurrentOrNewPlace = (Spinner)findViewById(R.id.spnCurrentOrNewPlace);
         etShortAddress = findViewById(R.id.etShortAddress);
         etFullAddress = findViewById(R.id.etFullAddress);
+        progressBar = findViewById(R.id.progressBar);
         placeID = getIntent().getExtras().getString("employeeID");
         shortAddress = getIntent().getExtras().getString("shortAddress");
         fullAddress = getIntent().getExtras().getString("fullAddress");
@@ -88,24 +91,43 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
     {
         String type = "addNewPlace";
         new BackgroundWorker(this, this).execute(type, etShortAddress.getText().toString(), etFullAddress.getText().toString());
+        progressBar.setVisibility(View.VISIBLE);
+        actViewsEnabled(false);
     }
 
     public void onChangeBtn(View view)
     {
         String type = "changePlace";
         new BackgroundWorker(this, this).execute(type, placeID, etShortAddress.getText().toString(), etFullAddress.getText().toString());
+        progressBar.setVisibility(View.VISIBLE);
+        actViewsEnabled(false);
     }
 
     public void onRemoveBtn(View view)
     {
         String type = "removePlace";
         new BackgroundWorker(this, this).execute(type, placeID);
+        progressBar.setVisibility(View.VISIBLE);
+        actViewsEnabled(false);
     }
 
+
     private void getFreshData(){
-        new BackgroundWorker(this, this).execute("getEquip");
-        new BackgroundWorker(this, this).execute("getStaff");
         new BackgroundWorker(this, this).execute("getAddresses");
+    }
+
+    private void actViewsEnabled(Boolean state){
+        btnAddPlace.setEnabled(state);
+        btnChangePlace.setEnabled(state);
+        btnRemovePlace.setEnabled(state);
+        spnCurrentOrNewPlace.setEnabled(state);
+        etShortAddress.setEnabled(state);
+        etFullAddress.setEnabled(state);
+    }
+
+    private void ifAllDataReceived(){
+        progressBar.setVisibility(View.INVISIBLE);
+        actViewsEnabled(true);
     }
 
     public void processFinish(String output, String typeFinishedProc) {
@@ -114,26 +136,20 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
             if(output.equals("Update successful")) {
                 Toast.makeText(this, "Добавлен новый объект", Toast.LENGTH_LONG).show();
                 getFreshData();
-                Intent intent = new Intent(".PlaceListActivity");
-                startActivity(intent);
             }
         }
-        if(typeFinishedProc.equals("changePlace"))
+        else if(typeFinishedProc.equals("changePlace"))
         {
             if(output.equals("Update successful")) {
                 Toast.makeText(this, "Объект изменен", Toast.LENGTH_LONG).show();
                 getFreshData();
-                Intent intent = new Intent(".PlaceListActivity");
-                startActivity(intent);
             }
         }
-        if(typeFinishedProc.equals("removePlace"))
+        else if(typeFinishedProc.equals("removePlace"))
         {
             if(output.equals("Update successful")) {
                 Toast.makeText(this, "Объект удален", Toast.LENGTH_LONG).show();
                 getFreshData();
-                Intent intent = new Intent(".PlaceListActivity");
-                startActivity(intent);
             }
             else {
                 Toast toast = Toast.makeText(this, "На данном объекте находится инвентарь!", Toast.LENGTH_LONG);
@@ -142,17 +158,11 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
                 toast.show();
             }
         }
-        else if (typeFinishedProc.equals("getEquip")) {
-            ((GlobalInventoryaccounting)this.getApplication()).setEquipmentData(output);
-            //Log.d("Value","EquipmentData = " + ((GlobalInventoryaccounting) this.getApplication()).getEquipmentData());
-        }
-        else if(typeFinishedProc.equals("getStaff")){
-            ((GlobalInventoryaccounting)this.getApplication()).setStaffData(output);
-            //Log.d("Value","StaffData = " + ((GlobalInventoryaccounting) this.getApplication()).getStaffData());
-        }
         else if(typeFinishedProc.equals("getAddresses")){
             ((GlobalInventoryaccounting)this.getApplication()).setAddressesData(output);
-            //Log.d("Value","AddressesData = " + ((GlobalInventoryaccounting) this.getApplication()).getAddressesData());
+            ifAllDataReceived();
+            Intent intent = new Intent(".PlaceListActivity");
+            startActivity(intent);
         }
     }
 }

@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +22,7 @@ import java.util.List;
 public class ChangeEmployeeActivity extends AppCompatActivity  implements BackgroundWorkerResponse{
     Button btnAddEmployee, btnChangeEmployee, btnRemoveEmployee;
     Spinner spnCurrentOrNewEmployee;
+    ProgressBar progressBar;
     EditText etEmployeeName, etEmployeePhone, etEmployeePosition, etEmployeeTeam;
     String employeeID, employeeName, employeePhone, employeePosition, employeeTeam;
     ArrayList<String> positionData, teamData;
@@ -38,6 +40,7 @@ public class ChangeEmployeeActivity extends AppCompatActivity  implements Backgr
         etEmployeePhone = findViewById(R.id.etEmployeePhone);
         etEmployeePosition = findViewById(R.id.spinEtEmployeePosition);
         etEmployeeTeam = findViewById(R.id.spinEtEmployeeTeam);
+        progressBar = findViewById(R.id.progressBar);
         employeeID = getIntent().getExtras().getString("employeeID");
         employeePhone = getIntent().getExtras().getString("employeePhone");
         employeeName = getIntent().getExtras().getString("employeeName");
@@ -47,7 +50,6 @@ public class ChangeEmployeeActivity extends AppCompatActivity  implements Backgr
         fillActvByEmployeeInfo();
         fillEtSpinPositionAndTeam();
     }
-
 
     private void fillSpnCurrentOrNewEmployee(){
         List<String> spnCurrentOrNewEmployeeArray =  new ArrayList<String>();
@@ -159,6 +161,8 @@ public class ChangeEmployeeActivity extends AppCompatActivity  implements Backgr
         String type = "addNewEmployee";
         if(etEmployeePhone.getText().length()==10){
             new BackgroundWorker(this, this).execute(type, etEmployeeName.getText().toString(), etEmployeePhone.getText().toString(), etEmployeePosition.getText().toString(), etEmployeeTeam.getText().toString());
+            progressBar.setVisibility(View.VISIBLE);
+            actViewsEnabled(false);
         }
         else{
             Toast toast = Toast.makeText(this, "Номер телефона должен содержать 10 цифр", Toast.LENGTH_SHORT);
@@ -172,18 +176,39 @@ public class ChangeEmployeeActivity extends AppCompatActivity  implements Backgr
     {
         String type = "changeEmployee";
         new BackgroundWorker(this, this).execute(type, employeeID, etEmployeeName.getText().toString(), etEmployeePhone.getText().toString(), etEmployeePosition.getText().toString(), etEmployeeTeam.getText().toString());
+        progressBar.setVisibility(View.VISIBLE);
+        actViewsEnabled(false);
     }
 
     public void onRemoveBtn(View view)
     {
         String type = "removeEmployee";
         new BackgroundWorker(this, this).execute(type, employeeID);
+        progressBar.setVisibility(View.VISIBLE);
+        actViewsEnabled(false);
     }
 
     private void getFreshData(){
-        new BackgroundWorker(this, this).execute("getEquip");
         new BackgroundWorker(this, this).execute("getStaff");
-        new BackgroundWorker(this, this).execute("getAddresses");
+        progressBar.setVisibility(View.VISIBLE);
+        actViewsEnabled(false);
+    }
+
+
+    private void actViewsEnabled(Boolean state){
+        btnAddEmployee.setEnabled(state);
+        btnChangeEmployee.setEnabled(state);
+        btnRemoveEmployee.setEnabled(state);
+        spnCurrentOrNewEmployee.setEnabled(state);
+        etEmployeeName.setEnabled(state);
+        etEmployeePhone.setEnabled(state);
+        etEmployeePosition.setEnabled(state);
+        etEmployeeTeam.setEnabled(state);
+    }
+
+    private void ifAllDataReceived(){
+        progressBar.setVisibility(View.INVISIBLE);
+        actViewsEnabled(true);
     }
 
     public void processFinish(String output, String typeFinishedProc) {
@@ -192,26 +217,20 @@ public class ChangeEmployeeActivity extends AppCompatActivity  implements Backgr
             if(output.equals("Update successful")) {
                 Toast.makeText(this, "Добавлен новый сотрудник", Toast.LENGTH_LONG).show();
                 getFreshData();
-                Intent intent = new Intent(".StaffListActivity");
-                startActivity(intent);
             }
         }
-        if(typeFinishedProc.equals("changeEmployee"))
+        else if (typeFinishedProc.equals("changeEmployee"))
         {
             if(output.equals("Update successful")) {
                 Toast.makeText(this, "Сотрудник изменен", Toast.LENGTH_LONG).show();
                 getFreshData();
-                Intent intent = new Intent(".StaffListActivity");
-                startActivity(intent);
             }
         }
-        if(typeFinishedProc.equals("removeEmployee"))
+        else if(typeFinishedProc.equals("removeEmployee"))
         {
             if(output.equals("Update successful")) {
                 Toast.makeText(this, "Сотрудник удален", Toast.LENGTH_LONG).show();
                 getFreshData();
-                Intent intent = new Intent(".StaffListActivity");
-                startActivity(intent);
             }
             else {
                 Toast toast = Toast.makeText(this, "За этим сотрудником закреплен инвентарь!", Toast.LENGTH_LONG);
@@ -220,17 +239,11 @@ public class ChangeEmployeeActivity extends AppCompatActivity  implements Backgr
                 toast.show();
             }
         }
-        else if (typeFinishedProc.equals("getEquip")) {
-            ((GlobalInventoryaccounting)this.getApplication()).setEquipmentData(output);
-            //Log.d("Value","EquipmentData = " + ((GlobalInventoryaccounting) this.getApplication()).getEquipmentData());
-        }
         else if(typeFinishedProc.equals("getStaff")){
             ((GlobalInventoryaccounting)this.getApplication()).setStaffData(output);
-            //Log.d("Value","StaffData = " + ((GlobalInventoryaccounting) this.getApplication()).getStaffData());
-        }
-        else if(typeFinishedProc.equals("getAddresses")){
-            ((GlobalInventoryaccounting)this.getApplication()).setAddressesData(output);
-            //Log.d("Value","AddressesData = " + ((GlobalInventoryaccounting) this.getApplication()).getAddressesData());
+            ifAllDataReceived();
+            Intent intent = new Intent(".StaffListActivity");
+            startActivity(intent);
         }
     }
 }

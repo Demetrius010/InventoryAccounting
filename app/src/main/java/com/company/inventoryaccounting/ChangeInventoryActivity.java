@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -28,13 +29,14 @@ import java.util.Objects;
 public class ChangeInventoryActivity extends AppCompatActivity implements BackgroundWorkerResponse {//View.OnTouchListener, AdapterView.OnItemClickListener
     Button btnAddInventory, btnChangeInventory, btnRemoveInventory;
     Spinner spnCurrentOrNewEqup, spnCondition, spnInvResponsible, spnInvPlace;
-    //AutoCompleteTextView , actvInvCategory;
+    ProgressBar progressBar;
 
-    Map<String, String> allEquipmentsName, allInvNum, allInvCategory, allInvCondition, allInvResponsible, allInvAddresses;
     Map<String, String> allConditions, allResponsible, allAddresses;
 
     ArrayAdapter<String> spnConditionsDataAdapter, responsibleDataAdapter, addressesDataAdapter;
     ArrayList<String> categoryData;
+
+    Boolean receivedEquipData, receivedStaffData, receivedAddressesData;
 
     String responsibleData;
     String addressesData;
@@ -47,7 +49,6 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_inventory);
-
         btnAddInventory = (Button) findViewById(R.id.btnAddInventory);
         btnChangeInventory = (Button) findViewById(R.id.btnChangeInventory);
         btnRemoveInventory = (Button) findViewById(R.id.btnRemoveInventory);
@@ -60,22 +61,36 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
         etBarcode = findViewById(R.id.etBarCode);
         etDescription = findViewById(R.id.etDesc);
         etCategory = (EditText) findViewById(R.id.categorySpinEt);
+        progressBar = findViewById(R.id.progressBar);
 
         fillSpinResponsible();
         fillSpinAddresses();
         fillSpinCondition();
 
         instrumentId = getIntent().getExtras().getString("idInstrument");
-        new BackgroundWorker(this, this).execute("getEquipByID", instrumentId);
+        if(!instrumentId.equals("new")) {
+            new BackgroundWorker(this, this).execute("getEquipByID", instrumentId);
+            progressBar.setVisibility(View.VISIBLE);
+            actViewsEnabled(false);
+        }
+        else
+            etBarcode.setText(getIntent().getExtras().getString("equipBarcode"));
         ifAdmin();
     }
 
+    @Override
+    protected void onStart() {
+        receivedEquipData = receivedStaffData = receivedAddressesData = false;
+        super.onStart();
+    }
 
     public void onAddInventoryBtn(View view) {
         String type = "addNewInventory";
         new BackgroundWorker(this, this).execute(type, etName.getText().toString(), etInvNum.getText().toString(), etBarcode.getText().toString(), etCategory.getText().toString(),
                 spnCondition.getSelectedItem().toString(), getKeyByValue(allResponsible, spnInvResponsible.getSelectedItem().toString()), getKeyByValue(allAddresses, spnInvPlace.getSelectedItem().toString()),
                 etDescription.getText().toString());
+        progressBar.setVisibility(View.VISIBLE);
+        actViewsEnabled(false);
     }
 
     public void onChangeInventoryBtn(View view) {
@@ -83,11 +98,15 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
         new BackgroundWorker(this, this).execute(type, instrumentId, etName.getText().toString(), etInvNum.getText().toString(), etBarcode.getText().toString(), etCategory.getText().toString(),
                 spnCondition.getSelectedItem().toString(), getKeyByValue(allResponsible, spnInvResponsible.getSelectedItem().toString()), getKeyByValue(allAddresses, spnInvPlace.getSelectedItem().toString()),
                 etDescription.getText().toString());
+        progressBar.setVisibility(View.VISIBLE);
+        actViewsEnabled(false);
     }
 
     public void onRemoveInventoryBtn(View view) {
         String type = "removeInventory";
         new BackgroundWorker(this, this).execute(type, instrumentId);
+        progressBar.setVisibility(View.VISIBLE);
+        actViewsEnabled(false);
     }
 
     public void ifAdmin() {
@@ -267,6 +286,31 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
         }
     }
 
+    private void actViewsEnabled(Boolean state){
+        btnAddInventory.setEnabled(state);
+        btnChangeInventory.setEnabled(state);
+        btnRemoveInventory.setEnabled(state);
+        spnCurrentOrNewEqup.setEnabled(state);
+        spnCondition.setEnabled(state);
+        spnInvResponsible.setEnabled(state);
+        spnInvPlace.setEnabled(state);
+        etCategory.setEnabled(state);
+        etBarcode.setEnabled(state);
+        etName.setEnabled(state);
+        etInvNum.setEnabled(state);
+        etDescription.setEnabled(state);
+    }
+
+    private void ifAllDataReceived(){
+        if(receivedEquipData && receivedStaffData && receivedAddressesData){
+            progressBar.setVisibility(View.INVISIBLE);
+            actViewsEnabled(true);
+            Intent intent = new Intent(".ToolListActivity");
+            startActivity(intent);
+        }
+    }
+
+
     private void getFreshData(){
         new BackgroundWorker(this, this).execute("getEquip");
         new BackgroundWorker(this, this).execute("getStaff");
@@ -274,69 +318,75 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
     }
 
     public void processFinish(String output, String typeFinishedProc) {
-        if (typeFinishedProc.equals("getEquipByID")) {
-            try {
-                JSONObject jsonObject = new JSONObject(output);
-                JSONArray jsonArray = jsonObject.getJSONArray("server_response");
-                jsonObject = jsonArray.getJSONObject(0);
-                name = jsonObject.getString("name");
-                inventory_num = jsonObject.getString("inventory_num");
-                barcode = jsonObject.getString("barcode");
-                equip_condition = jsonObject.getString("equip_condition");
-                responsible = jsonObject.getString("responsible");
-                space = jsonObject.getString("space");
-                category = jsonObject.getString("category");
-                description = jsonObject.getString("description");
+        if(output != null){
+            if (typeFinishedProc.equals("getEquipByID")) {
+                try {
+                    JSONObject jsonObject = new JSONObject(output);
+                    JSONArray jsonArray = jsonObject.getJSONArray("server_response");
+                    jsonObject = jsonArray.getJSONObject(0);
+                    name = jsonObject.getString("name");
+                    inventory_num = jsonObject.getString("inventory_num");
+                    barcode = jsonObject.getString("barcode");
+                    equip_condition = jsonObject.getString("equip_condition");
+                    responsible = jsonObject.getString("responsible");
+                    space = jsonObject.getString("space");
+                    category = jsonObject.getString("category");
+                    description = jsonObject.getString("description");
                 /*if (!(((GlobalInventoryaccounting) this.getApplication()).isAdmin()))
                 {
                     etEquipName.setEnabled(false);
                     etEquipInventoryNum.setEnabled(false);
                 }*/
-                //Log.d("Values", "getAllEquip id =" + id + " name = " + name + " inventoryNum = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
-                fillActByEquip();
-                fillSpnCurrentOrNewEqup();
-            } catch (JSONException e) {
-                e.printStackTrace();
+                    fillActByEquip();
+                    fillSpnCurrentOrNewEqup();
+                    progressBar.setVisibility(View.INVISIBLE);
+                    actViewsEnabled(true);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        else if(typeFinishedProc.equals("addNewInventory"))
-        {
-            if(output.equals("Update successful")) {
-                Toast.makeText(this, "Добавлен новый инвентарь", Toast.LENGTH_LONG).show();
-                getFreshData();
-                Intent intent = new Intent(".ToolListActivity");
-                startActivity(intent);
+            else if(typeFinishedProc.equals("addNewInventory"))
+            {
+                if(output.equals("Update successful")) {
+                    Toast.makeText(this, "Добавлен новый инвентарь", Toast.LENGTH_LONG).show();
+                    getFreshData();
+                }
             }
-        }
-        else if(typeFinishedProc.equals("saveEquip"))
-        {
-            if(output.equals("Update successful")) {
-                Toast.makeText(this, "Инвентарь изменен", Toast.LENGTH_LONG).show();
-                getFreshData();
-                Intent intent = new Intent(".ToolListActivity");
-                startActivity(intent);
+            else if(typeFinishedProc.equals("saveEquip"))
+            {
+                if(output.equals("Update successful")) {
+                    Toast.makeText(this, "Инвентарь изменен", Toast.LENGTH_LONG).show();
+                    getFreshData();
+                }
             }
-        }
-        else if(typeFinishedProc.equals("removeInventory"))
-        {
-            if(output.equals("Update successful")) {
-                Toast.makeText(this, "Инвентарь удален", Toast.LENGTH_LONG).show();
-                getFreshData();
-                Intent intent = new Intent(".ToolListActivity");
-                startActivity(intent);
+            else if(typeFinishedProc.equals("removeInventory"))
+            {
+                if(output.equals("Update successful")) {
+                    Toast.makeText(this, "Инвентарь удален", Toast.LENGTH_LONG).show();
+                    getFreshData();
+                }
             }
-        }
-        else if (typeFinishedProc.equals("getEquip")) {
-            ((GlobalInventoryaccounting)this.getApplication()).setEquipmentData(output);
-            //Log.d("Value","EquipmentData = " + ((GlobalInventoryaccounting) this.getApplication()).getEquipmentData());
-        }
-        else if(typeFinishedProc.equals("getStaff")){
-            ((GlobalInventoryaccounting)this.getApplication()).setStaffData(output);
-            //Log.d("Value","StaffData = " + ((GlobalInventoryaccounting) this.getApplication()).getStaffData());
-        }
-        else if(typeFinishedProc.equals("getAddresses")){
-            ((GlobalInventoryaccounting)this.getApplication()).setAddressesData(output);
-            //Log.d("Value","AddressesData = " + ((GlobalInventoryaccounting) this.getApplication()).getAddressesData());
+            else if (typeFinishedProc.equals("getEquip")) {
+                ((GlobalInventoryaccounting)this.getApplication()).setEquipmentData(output);
+                receivedEquipData = true;
+                //if(receivedStaffData && receivedAddressesData){
+                    ifAllDataReceived();
+                //}
+            }
+            else if(typeFinishedProc.equals("getStaff")){
+                ((GlobalInventoryaccounting)this.getApplication()).setStaffData(output);
+                receivedStaffData = true;
+                //if(receivedEquipData && receivedAddressesData){
+                    ifAllDataReceived();
+                //}
+            }
+            else if(typeFinishedProc.equals("getAddresses")){
+                ((GlobalInventoryaccounting)this.getApplication()).setAddressesData(output);
+                receivedAddressesData = true;
+                //if(receivedEquipData && receivedStaffData){
+                    ifAllDataReceived();
+                //}
+            }
         }
     }
 

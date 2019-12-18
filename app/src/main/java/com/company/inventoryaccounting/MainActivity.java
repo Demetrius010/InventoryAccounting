@@ -2,6 +2,7 @@ package com.company.inventoryaccounting;
 
 
 import android.content.Intent;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
@@ -11,6 +12,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -22,15 +24,21 @@ import java.util.HashMap;
 public class MainActivity extends AppCompatActivity implements BackgroundWorkerResponse {
     Button btnLogin;
     EditText etPhone;  //etPassword
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (android.os.Build.VERSION.SDK_INT > 9)
+        {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
         etPhone = (EditText)findViewById(R.id.etPhone);
         //etPassword = (EditText)findViewById(R.id.etPassword);
         btnLogin = (Button)findViewById(R.id.btnLogin);
-
+        progressBar = findViewById(R.id.progressBar);
         phoneMaskInput();
     }
 
@@ -109,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements BackgroundWorkerR
         });
     }
 
-
     public void onLogin(View view){
         String type = "login";
         String phone = etPhone.getText().toString().replace("+7", "").replaceAll("[^\\d]", "");
@@ -117,33 +124,51 @@ public class MainActivity extends AppCompatActivity implements BackgroundWorkerR
         //BackgroundWorker backgroundWorkerLogin = new BackgroundWorker(this);
         //backgroundWorkerLogin.execute(type, phone);
         new BackgroundWorker(this, this).execute(type, phone);
+        progressBar.setVisibility(View.VISIBLE);
+        actViewsEnabled(false);
     }
+
+    private void actViewsEnabled(Boolean state){
+        etPhone.setEnabled(state);
+        btnLogin.setEnabled(state);
+    }
+
+    private void ifResponseReceived(){
+        progressBar.setVisibility(View.INVISIBLE);
+        actViewsEnabled(true);
+    }
+
 
     @Override
     public void processFinish(String output, String typeFinishedProc) {
-        if(typeFinishedProc.equals("login")){
-            try {
-                String admin = "";
-                JSONObject jsonObject = new JSONObject(output);
-                JSONArray jsonArray = jsonObject.getJSONArray("server_response");
-                if(jsonArray.length()>0){
-                    for(int i = 0; i < jsonArray.length(); i++){
-                        JSONObject jsonObj = jsonArray.getJSONObject(i);
-                        admin = jsonObj.getString("admin");
+        if(output != null){
+            if(typeFinishedProc.equals("login")){
+                try {
+                    ifResponseReceived();
+                    String admin = "";
+                    JSONObject jsonObject = new JSONObject(output);
+                    JSONArray jsonArray = jsonObject.getJSONArray("server_response");
+                    if(jsonArray.length()>0){
+                        for(int i = 0; i < jsonArray.length(); i++){
+                            JSONObject jsonObj = jsonArray.getJSONObject(i);
+                            admin = jsonObj.getString("admin");
+                        }
+                        if(admin.equals("1"))
+                        {
+                            ((GlobalInventoryaccounting)this.getApplication()).setAdminFlag(true);
+                        }
+                        else {
+                            ((GlobalInventoryaccounting)this.getApplication()).setAdminFlag(false);
+                        }
+
+                        Intent intent = new Intent(".MainMenuActivity");
+                        startActivity(intent);
                     }
-                    if(admin.equals("1"))
-                    {
-                        ((GlobalInventoryaccounting)this.getApplication()).setAdminFlag(true);
-                    }
-                    else {
-                        ((GlobalInventoryaccounting)this.getApplication()).setAdminFlag(false);
-                    }
-                    Intent intent = new Intent(".MainMenuActivity");
-                    startActivity(intent);
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+                catch (JSONException e) {
+                    e.printStackTrace();
+                }
         }
+    }
     }
 }

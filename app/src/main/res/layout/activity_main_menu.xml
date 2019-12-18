@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".MainMenuActivity">
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="7dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/BKLogo"
         android:layout_width="wrap_content"
@@ -60,6 +72,7 @@
         android:onClick="onPlacesButton"
         android:text="Помещения"
         android:textColor="#FFFFFF"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnEmployee" />
@@ -72,6 +85,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:background="@color/colorPrimary"
+        android:onClick="onScanButton"
         android:text="Сканировать"
         android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
@@ -92,14 +106,15 @@
         app:layout_constraintTop_toBottomOf="@+id/btnScan">
 
         <EditText
-            android:id="@+id/etSearchByBarcode"
+            android:id="@+id/etSearchByInvNum"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:ems="10"
             android:hint="Поиск по коду"
-            android:inputType="textPersonName"
+            android:inputType="textNoSuggestions"
+            android:maxLines="1"
             android:textSize="18sp" />
 
         <ImageButton
@@ -109,6 +124,7 @@
             android:layout_margin="3dp"
             android:background="@color/colorPrimary"
             android:contentDescription="@android:string/search_go"
+            android:onClick="onSearchButton"
             android:padding="3dp"
             android:scaleType="fitXY"
             android:src="@drawable/white_search" />

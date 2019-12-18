@@ -158,40 +158,42 @@ public class ChangeInstrument extends AppCompatActivity implements BackgroundWor
 
     @Override
     public void processFinish(String output, String typeFinishedProc) {
-        if (typeFinishedProc.equals("getEquipByID")) {
-            try {
-                String name, inventory_num, responsible, space, equip_condition;
-                JSONObject jsonObject = new JSONObject(output);
-                JSONArray jsonArray = jsonObject.getJSONArray("server_response");
-                jsonObject = jsonArray.getJSONObject(0);
+        if(output != null){
+            if (typeFinishedProc.equals("getEquipByID")) {
+                try {
+                    String name, inventory_num, responsible, space, equip_condition;
+                    JSONObject jsonObject = new JSONObject(output);
+                    JSONArray jsonArray = jsonObject.getJSONArray("server_response");
+                    jsonObject = jsonArray.getJSONObject(0);
 
-                name = jsonObject.getString("name");
-                inventory_num = jsonObject.getString("inventory_num");
-                etEquipName.setText(name);
-                etEquipInventoryNum.setText(inventory_num);
+                    name = jsonObject.getString("name");
+                    inventory_num = jsonObject.getString("inventory_num");
+                    etEquipName.setText(name);
+                    etEquipInventoryNum.setText(inventory_num);
 
-                equip_condition = jsonObject.getString("equip_condition");
-                int spinCondPosition = dataAdapterForConditions.getPosition(equip_condition);
-                spinCondition.setSelection(spinCondPosition);
+                    equip_condition = jsonObject.getString("equip_condition");
+                    int spinCondPosition = dataAdapterForConditions.getPosition(equip_condition);
+                    spinCondition.setSelection(spinCondPosition);
 
-                responsible = jsonObject.getString("responsible");
-                int spinResponsiblePosition = responsibleDataAdapter.getPosition(allResponsible.get(responsible));
-                spinResponsible.setSelection(spinResponsiblePosition);
+                    responsible = jsonObject.getString("responsible");
+                    int spinResponsiblePosition = responsibleDataAdapter.getPosition(allResponsible.get(responsible));
+                    spinResponsible.setSelection(spinResponsiblePosition);
 
-                space = jsonObject.getString("space");
-                int spinSpacePosition = addressesDataAdapter.getPosition(allAddresses.get(space));
-                spinPlace.setSelection(spinSpacePosition);
+                    space = jsonObject.getString("space");
+                    int spinSpacePosition = addressesDataAdapter.getPosition(allAddresses.get(space));
+                    spinPlace.setSelection(spinSpacePosition);
 
-                if (!(((GlobalInventoryaccounting) this.getApplication()).isAdmin()))
-                {
-                    etEquipName.setEnabled(false);
-                    etEquipInventoryNum.setEnabled(false);
+                    if (!(((GlobalInventoryaccounting) this.getApplication()).isAdmin()))
+                    {
+                        etEquipName.setEnabled(false);
+                        etEquipInventoryNum.setEnabled(false);
+                    }
+                    //category = jsonObject.getString("category"); responsible = jsonObj.getString("responsible");//space = jsonObj.getString("space");//
+                    //Log.d("Values", "getAllEquip id =" + id + " name = " + name + " equipBarcode = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                //category = jsonObject.getString("category"); responsible = jsonObj.getString("responsible");//space = jsonObj.getString("space");//
-                //Log.d("Values", "getAllEquip id =" + id + " name = " + name + " inventoryNum = " + inventory_num + " category = " + category + " responsible = " + responsible + " space = " + space + " equip_condition = " + equip_condition);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
         }
         else if (typeFinishedProc.equals("saveEquip")) {

@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ToolListActivity extends AppCompatActivity{// implements BackgroundWorkerResponse {
+public class ToolListActivity extends AppCompatActivity{
     LinearLayout myLinearLayout;
     SearchView searchView;
 
@@ -431,6 +431,7 @@ public class ToolListActivity extends AppCompatActivity{// implements Background
             e.printStackTrace();
         }
     }
+
     private void fillResponsibleDictionary(){// получаем ответственных
         String reponsibleId, responsibleFullName;
         allResponsible = new HashMap<String, String>();//map.put("dog", "type of animal");//System.out.println(map.get("dog"));
@@ -474,17 +475,17 @@ public class ToolListActivity extends AppCompatActivity{// implements Background
     {/*
         try {
             String category;
-            List<String> allCategories = new ArrayList<String>();
+            List<String> instrumentBarcode = new ArrayList<String>();
             JSONArray jsonArray = new JSONArray(jsonString);
             //Log.d("Value", "jsonString" + jsonString);
             for(int i = 0; i < jsonArray.length(); i++){
                 JSONObject jsonObj = jsonArray.getJSONObject(i);
                 category = jsonObj.getString("category");
-                if (!allCategories.contains(category)) {
-                    allCategories.add(category);
+                if (!instrumentBarcode.contains(category)) {
+                    instrumentBarcode.add(category);
                 }
             }
-            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allCategories);
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, instrumentBarcode);
             dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spnCategory.setAdapter(dataAdapter);
         } catch (JSONException e) {
