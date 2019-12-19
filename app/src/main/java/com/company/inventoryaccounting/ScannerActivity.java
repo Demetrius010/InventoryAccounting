@@ -16,11 +16,13 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.vision.CameraSource;
@@ -47,6 +49,7 @@ public class ScannerActivity extends AppCompatActivity{
     BarcodeDetector barcodeDetector;
     CameraSource cameraSource;
 
+    private String onChangeBarcodeBtn = "";
     private Boolean flashlightMode;
     private Camera camera = null;
     //private CameraManager camManager;
@@ -59,6 +62,9 @@ public class ScannerActivity extends AppCompatActivity{
         Toolbar toolbar = findViewById(R.id.scanner_tool_bar);
         setSupportActionBar(toolbar);
         surfaceView = findViewById(R.id.surfaceView);
+        if (getIntent().getExtras() != null) {
+            onChangeBarcodeBtn = getIntent().getExtras().getString("onChangeBarcodeBtn");
+        }
     }
 
     @Override
@@ -77,26 +83,51 @@ public class ScannerActivity extends AppCompatActivity{
                 SparseArray<Barcode> barcodes =  detections.getDetectedItems();
                 if(barcodes.size()!=0){
                     Intent intent = new Intent(".ChangeInventoryActivity");
-                    if(instrumentBarcode.containsValue(barcodes.valueAt(0).rawValue)){// если существует инструмент с такми штрихкодом открываем его
-                        intent.putExtra("idInstrument", getKeyByValue(instrumentBarcode, barcodes.valueAt(0).rawValue));
-                        startActivity(intent);
-                    }
-                    else if(((GlobalInventoryaccounting) thisActivity.getApplication()).isAdmin()){// если не существует то открываем админу активити для создания нового инструмента
-                        intent.putExtra("idInstrument", "new");
-                        intent.putExtra("equipBarcode",  barcodes.valueAt(0).rawValue);
-                        startActivity(intent);
-                    }
-                    else {
-                        thisActivity.runOnUiThread(new Runnable() {// запуск в Ui потоке основной активити
-                            @Override
-                            public void run() {
-                                if (myToast != null) {
-                                    myToast.cancel();
+                    if(onChangeBarcodeBtn.equals("true")){/*Поведение активити если была нажата кнопка изменения штрих кода (в окне изменения инвентаря)*/
+                        if(instrumentBarcode.containsValue(barcodes.valueAt(0).rawValue)){// если существует инструмент с такми штрихкодом то пишем
+                            thisActivity.runOnUiThread(new Runnable() {// запуск в Ui потоке основной активити
+                                @Override
+                                public void run() {
+                                    if (myToast != null) {
+                                        myToast.cancel();
+                                    }
+                                    myToast = Toast.makeText(thisActivity, "Инвентарь с таким штрих-кодом уже существует", Toast.LENGTH_SHORT);
+                                    TextView v = (TextView) myToast.getView().findViewById(android.R.id.message);
+                                    if( v != null) v.setGravity(Gravity.CENTER);
+                                    myToast.show();
                                 }
-                                myToast = Toast.makeText(thisActivity, "Инструмент не найден", Toast.LENGTH_SHORT);// если не существует то пишем пользователю:"Инвентарь с таким штрих кодом не найден"
-                                myToast.show();
-                            }
-                        });
+                            });
+                        }
+                        else if(((GlobalInventoryaccounting) thisActivity.getApplication()).isAdmin()){// если не существует то открываем админу активити для создания нового инструмента
+                            ((GlobalInventoryaccounting) thisActivity.getApplication()).setNewEquipBarcode(barcodes.valueAt(0).rawValue); // передаем новый Barcode
+                            //intent.setFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
+                            startActivity(intent);
+                        }
+                    }
+                    else {/*Поведение активити если была нажата кнопка СКАНИРОВАТЬ (в главном меню)*/
+                        if(instrumentBarcode.containsValue(barcodes.valueAt(0).rawValue)){// если существует инструмент с такми штрихкодом открываем его
+                            intent.putExtra("idInstrument", getKeyByValue(instrumentBarcode, barcodes.valueAt(0).rawValue));
+                            //intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                            startActivity(intent);
+                        }
+                        else if(((GlobalInventoryaccounting) thisActivity.getApplication()).isAdmin()){// если не существует то открываем админу активити для создания нового инструмента
+                            intent.putExtra("idInstrument", "newEquip");
+                            intent.putExtra("equipBarcode",  barcodes.valueAt(0).rawValue);
+                            //intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                            startActivity(intent);
+                        }
+                        else {
+                            thisActivity.runOnUiThread(new Runnable() {// запуск в Ui потоке основной активити
+                                @Override
+                                public void run() {
+                                    if (myToast != null) {
+                                        myToast.cancel();
+                                    }
+                                    myToast = Toast.makeText(thisActivity, "Инвентарь не найден", Toast.LENGTH_SHORT);// если не существует то пишем пользователю:"Инвентарь с таким штрих кодом не найден"
+                                    myToast.show();
+                                }
+                            });
+                        }
                     }
                 }
             }

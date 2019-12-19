@@ -66,21 +66,29 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
         fillSpinResponsible();
         fillSpinAddresses();
         fillSpinCondition();
-
         instrumentId = getIntent().getExtras().getString("idInstrument");
-        if(!instrumentId.equals("new")) {
+        if (!instrumentId.equals("newEquip")) {
             new BackgroundWorker(this, this).execute("getEquipByID", instrumentId);
             progressBar.setVisibility(View.VISIBLE);
             actViewsEnabled(false);
-        }
-        else
+        } else{
             etBarcode.setText(getIntent().getExtras().getString("equipBarcode"));
+            btnChangeInventory.setEnabled(false);
+            btnChangeInventory.getBackground().setAlpha(100);
+            btnRemoveInventory.setEnabled(false);
+            btnRemoveInventory.getBackground().setAlpha(100);
+            spnCurrentOrNewEqup.setVisibility(View.GONE);
+        }
         ifAdmin();
     }
 
     @Override
     protected void onStart() {
         receivedEquipData = receivedStaffData = receivedAddressesData = false;
+        if(!((GlobalInventoryaccounting) this.getApplication()).getNewEquipBarcode().equals("")){// если эта активити была открыта после изменения штирх-кода
+            etBarcode.setText(((GlobalInventoryaccounting) this.getApplication()).getNewEquipBarcode());// то запишем сосканированный штрих-код
+            ((GlobalInventoryaccounting) this.getApplication()).setNewEquipBarcode("");
+        }
         super.onStart();
     }
 
@@ -113,6 +121,7 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
         if(((GlobalInventoryaccounting) this.getApplication()).isAdmin())
         {
             fillEtSpinCategory();
+            addEtBarcodeScanBtn();
         }
         else {
             spnCurrentOrNewEqup.setEnabled(false);
@@ -144,6 +153,25 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
         }
     }
 
+    private void addEtBarcodeScanBtn(){
+        etBarcode.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_crop_free_black_24dp, 0);//добавляем иконку
+        etBarcode.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                final int DRAWABLE_RIGHT = 2;
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {// Check if touch point is in the area of the right button
+                    if (motionEvent.getX() >= (view.getWidth() - ((EditText) view)
+                            .getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        Intent intent = new Intent(".ScannerActivity"); // your action here
+                        intent.putExtra("onChangeBarcodeBtn",  "true");
+                        startActivity(intent);
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+    }
 
     private void fillEtSpinCategory() {
         etCategory.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_drop_down, 0);//добавляем иконку
@@ -290,7 +318,7 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
         btnAddInventory.setEnabled(state);
         btnChangeInventory.setEnabled(state);
         btnRemoveInventory.setEnabled(state);
-        spnCurrentOrNewEqup.setEnabled(state);
+        spnCurrentOrNewEqup.setClickable(state);
         spnCondition.setEnabled(state);
         spnInvResponsible.setEnabled(state);
         spnInvPlace.setEnabled(state);
@@ -307,6 +335,7 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
             actViewsEnabled(true);
             Intent intent = new Intent(".ToolListActivity");
             startActivity(intent);
+            finish();
         }
     }
 
@@ -389,8 +418,6 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
             }
         }
     }
-
-
 
     public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
         for (Map.Entry<T, E> entry : map.entrySet()) {

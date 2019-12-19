@@ -134,7 +134,6 @@
             android:configChanges="orientation"
             android:label="Учёт инвентаря"
             android:launchMode="singleTask"
-            android:noHistory="true"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name=".ChangeInventoryActivity" />

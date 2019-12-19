@@ -14,6 +14,14 @@ public class GlobalInventoryaccounting extends Application {
         this.adminFlag = admin;
     }
 
+    private String newEquipBarcode = "";
+    public String getNewEquipBarcode() {
+        return newEquipBarcode;
+    }
+    public void setNewEquipBarcode(String newBarcode) {
+        this.newEquipBarcode = newBarcode;
+    }
+
     private String equipmentData;
     public String getEquipmentData() {
         return equipmentData;
