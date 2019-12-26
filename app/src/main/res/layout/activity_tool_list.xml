@@ -4,15 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ToolListActivity">
+    tools:context=".ToolListActivity"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
     <include
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
 
-    <!--android:searchIcon="@null" -->
+    <EditText
+        android:id="@+id/etSearchByName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:drawableStart="@drawable/ic_search"
+        android:drawablePadding="5dp"
+        android:ems="10"
+        android:hint="Поиск"
+        android:inputType="textNoSuggestions"
+        android:maxLines="1"
+        android:padding="8dp"
+        android:singleLine="true"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
-    <SearchView
+    <!--<SearchView
         android:id="@+id/searchView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -25,7 +43,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
-    </SearchView>
+    </SearchView>-->
 
 
 
@@ -36,7 +54,7 @@
         android:background="#8B8B8B"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchView" />
+        app:layout_constraintTop_toBottomOf="@+id/etSearchByName" />
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -44,8 +62,10 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/separator">
+        app:layout_constraintTop_toBottomOf="@+id/separator"
+        app:layout_constraintVertical_bias="0.0">
 
         <LinearLayout
             android:id="@+id/linLayout"

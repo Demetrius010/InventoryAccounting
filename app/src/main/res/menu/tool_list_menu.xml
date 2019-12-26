@@ -40,6 +40,10 @@
             <item android:id="@+id/placeFilter"
                 android:title="Помещение">
                 <menu android:id="@+id/placeFilterMenu">
+                    <item android:id="@+id/applyPlaceFilter"
+                        android:title="@string/apply"
+                        app:showAsAction="always"
+                        android:icon="@drawable/ic_done_all_black_24dp"/>
                     <item android:id="@+id/placeNone"
                         android:title="Не выбрано"
                         android:checkable="true"
@@ -50,6 +54,10 @@
             <item android:id="@+id/categoryFilter"
                 android:title="Категория">
                 <menu>
+                    <item android:id="@+id/applyСategoryFilter"
+                        android:title="@string/apply"
+                        app:showAsAction="always"
+                        android:icon="@drawable/ic_done_all_black_24dp"/>
                     <item android:id="@+id/categoryNone"
                         android:title="Не выбрано"
                         android:checkable="true"
@@ -60,6 +68,10 @@
             <item android:id="@+id/conditionFilter"
                 android:title="Состояние">
                 <menu>
+                    <item android:id="@+id/applyConditionFilter"
+                        android:title="@string/apply"
+                        app:showAsAction="always"
+                        android:icon="@drawable/ic_done_all_black_24dp"/>
                     <item android:id="@+id/conditionNone"
                         android:title="Не выбрано"
                         android:checkable="true"
@@ -79,6 +91,10 @@
             <item android:id="@+id/employeeFilter"
                 android:title="Сотрудник">
                 <menu>
+                    <item android:id="@+id/applyEmployeeFilter"
+                        android:title="@string/apply"
+                        app:showAsAction="always"
+                        android:icon="@drawable/ic_done_all_black_24dp"/>
                     <item android:id="@+id/employeeNone"
                         android:title="Не выбрано"
                         android:checkable="true"
@@ -86,7 +102,7 @@
                 </menu>
             </item>
         </menu>
-    </item>
 
+    </item>
 
 </menu>

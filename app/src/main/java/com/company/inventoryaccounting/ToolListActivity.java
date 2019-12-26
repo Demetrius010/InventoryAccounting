@@ -1,5 +1,6 @@
 package com.company.inventoryaccounting;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -8,18 +9,28 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.Selection;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -33,10 +44,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.view.KeyEvent.KEYCODE_SEARCH;
+
 public class ToolListActivity extends AppCompatActivity{
     LinearLayout myLinearLayout;
-    SearchView searchView;
-
+    EditText searchEt;
     JSONObject jsonObject;
     JSONArray jsonArray;
 
@@ -47,6 +59,7 @@ public class ToolListActivity extends AppCompatActivity{
     Boolean placeFilterIsAct = false, categoryFilterIsAct = false, conditionFilterIsAct = false, employeeFilterIsAct = false; // флаг выбранного фильтра
     Boolean placeFilterWasChanged = false, categoryFilterWasChanged = false, conditionFilterWasChanged = false, employeeFilterWasChanged = false, sortWasChanged = true; // флаг что фильтр изменен
     Boolean ascendingSort = true, descendingSort = false, alphabetSort = false, reverseAlphabetSort = false; // флаг сортировки
+    //Boolean dynamicSearch = false;
     SubMenu placeFilterSubMenu, categoryFilterSubMenu, conditionFilterSubMenu, employeeFilterSubMenu;// подменю каждого фильтра
 
     ArrayList<String> selectedPlace = new ArrayList<String>();  //Хранят выбранные пункты фильтров
@@ -64,35 +77,79 @@ public class ToolListActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tool_list);
-        searchView = (SearchView) findViewById(R.id.searchView);
+        searchEt = (EditText) findViewById(R.id.etSearchByName);
         myLinearLayout = (LinearLayout) findViewById(R.id.linLayout);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
    }
 
+public void onSearchIcon(View view){
+
+}
     @Override
     protected void onStart() {
+        //dynamicSearch = false;
+        selectedPlace.clear();
+        selectedPlace.clear();
+        selectedEmployee.clear();
+        selectedCategory.clear();
+
         fillAddressesDictionary();
         fillCategoryDictionary();
         fillResponsibleDictionary();
         fillActWithItems();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public boolean onQueryTextSubmit(String s) {
-                searchStr = s;
-                fillActWithItems();
-                //Log.d("Value", "onQueryTextSubmit = " + searchStr);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                searchStr = s;
-                fillActWithItems();
-                //Log.d("Value", "onQueryTextChange = " + searchStr);
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_DONE) {
+                    searchStr = searchEt.getText().toString();
+                    fillActWithItems();
+                }
                 return false;
             }
         });
+        /*searchEt.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                searchEt.setSelection(searchEt.getText().length());//устанавливаем позицию курсора
+                final int DRAWABLE_LEFT = 0;
+                if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    if(motionEvent.getRawX() <= (searchEt.getLeft() + searchEt.getCompoundDrawables()[DRAWABLE_LEFT].getBounds().width())) {// если нажали по иконке поиска меняем режим поиска
+                        dynamicSearch = !dynamicSearch;
+                        if(dynamicSearch)
+                            searchEt.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_refresh_search_24dp, 0, 0, 0);// Set drawables for left, top, right, and bottom - send 0 for nothing
+                        else
+                            searchEt.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_search, 0, 0, 0);// Set drawables for left, top, right, and bottom - send 0 for nothing
+                        //searchEt.setSelection(searchEt.getText().length(), searchEt.getText().length());//устанавливаем позицию курсора
+                        //return true;
+                        searchEt.clearFocus();
+                    }
+                }
+                return false;
+            }
+        });
+        searchEt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(dynamicSearch){
+                    searchStr = charSequence.toString();
+                    fillActWithItems();
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+        /*searchEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {// убираем фокус со строки поиска если была нажата кнопка "принять"
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_DONE) {
+                    searchEt.clearFocus();
+                }
+                return false;
+            }
+        });*/
         super.onStart();
     }
 
@@ -119,6 +176,8 @@ public class ToolListActivity extends AppCompatActivity{
         return true;
     }
 
+
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) { //выполняем после того как создали меню
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
@@ -130,12 +189,25 @@ public class ToolListActivity extends AppCompatActivity{
                     //Log.d("Value", "value: onMenuVisibilityChanged = " + b);
             }
         });
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {// выполняем когда выбран определенный пункт меню
+        // Check if no view has focus:
+        View view = this.getCurrentFocus();// скрываем клавиатуру
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            searchEt.clearFocus();
+        }
         switch (item.getItemId()) {
+            case R.id.applyConditionFilter:
+            case R.id.applyEmployeeFilter:
+            case R.id.applyPlaceFilter:
+            case R.id.applyСategoryFilter:
+                return true;
             case R.id.ascendingSort:
                 item.setChecked(!item.isChecked());
                 ascendingSort = true;
@@ -190,7 +262,7 @@ public class ToolListActivity extends AppCompatActivity{
             placeFilterWasChanged = true;
             //Log.d("Value", "value: " + item.getTitle());
             if(item.getItemId() == R.id.placeNone) { // если место "не выбрано" то убираем все галки
-                for(int i = 0; i <placeFilterSubMenu.size(); i++){
+                for(int i = 1; i <placeFilterSubMenu.size(); i++){//0->1
                     placeFilterSubMenu.getItem(i).setChecked(false);
                 }
                 item.setChecked(true);
@@ -198,7 +270,7 @@ public class ToolListActivity extends AppCompatActivity{
                 placeFilterSubMenu.getItem().setIcon(null); // и убераем икону
             }
             else{
-                placeFilterSubMenu.getItem(0).setChecked(false);
+                placeFilterSubMenu.getItem(1).setChecked(false);//0->1
                 if(item.isChecked()){
                     item.setChecked(false);
                     selectedPlace.remove(item.getTitle().toString());// если снали галку удаляем из списка
@@ -216,7 +288,7 @@ public class ToolListActivity extends AppCompatActivity{
             categoryFilterWasChanged = true;
             //Log.d("Value", "value: " + item.getTitle());
             if(item.getItemId() == R.id.categoryNone) {
-                for(int i = 0; i <categoryFilterSubMenu.size(); i++){
+                for(int i = 1; i <categoryFilterSubMenu.size(); i++){//0->1
                     categoryFilterSubMenu.getItem(i).setChecked(false);
                 }
                 item.setChecked(true);
@@ -224,7 +296,7 @@ public class ToolListActivity extends AppCompatActivity{
                 categoryFilterSubMenu.getItem().setIcon(null);
             }
             else{
-                categoryFilterSubMenu.getItem(0).setChecked(false);
+                categoryFilterSubMenu.getItem(1).setChecked(false);//0->1
                 if(item.isChecked()){
                     item.setChecked(false);
                     selectedCategory.remove(item.getTitle().toString());
@@ -242,7 +314,7 @@ public class ToolListActivity extends AppCompatActivity{
             conditionFilterWasChanged = true;
             //Log.d("Value", "value: " + item.getTitle());
             if(item.getItemId() == R.id.conditionNone) {
-                for(int i = 0; i <conditionFilterSubMenu.size(); i++){
+                for(int i = 1; i <conditionFilterSubMenu.size(); i++){//0->1
                     conditionFilterSubMenu.getItem(i).setChecked(false);
                 }
                 item.setChecked(true);
@@ -250,7 +322,7 @@ public class ToolListActivity extends AppCompatActivity{
                 conditionFilterSubMenu.getItem().setIcon(null);
             }
             else{
-                conditionFilterSubMenu.getItem(0).setChecked(false);
+                conditionFilterSubMenu.getItem(1).setChecked(false);//0->1
                 if(item.isChecked()){
                     item.setChecked(false);
                     selectedCondition.remove(item.getTitle().toString());
@@ -266,7 +338,7 @@ public class ToolListActivity extends AppCompatActivity{
             employeeFilterWasChanged = true;
             //Log.d("Value", "value: " + item.getTitle());
             if(item.getItemId() == R.id.employeeNone) {
-                for(int i = 0; i <employeeFilterSubMenu.size(); i++){
+                for(int i = 1; i <employeeFilterSubMenu.size(); i++){//0->1
                     employeeFilterSubMenu.getItem(i).setChecked(false);
                 }
                 item.setChecked(true);
@@ -274,7 +346,7 @@ public class ToolListActivity extends AppCompatActivity{
                 employeeFilterSubMenu.getItem().setIcon(null);
             }
             else{
-                employeeFilterSubMenu.getItem(0).setChecked(false);
+                employeeFilterSubMenu.getItem(1).setChecked(false);//0->1
                 if(item.isChecked()){
                     item.setChecked(false);
                     selectedEmployee.remove(item.getTitle().toString());
@@ -286,7 +358,6 @@ public class ToolListActivity extends AppCompatActivity{
                 employeeFilterSubMenu.getItem().setIcon(R.drawable.ic_playlist_add_check_black);
             }
         }
-
         if(placeFilterIsAct || categoryFilterIsAct || conditionFilterIsAct || employeeFilterIsAct){/*Подавление сокрытия меню*/
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW); //marking the item as it has expandable/collapsible behavior
             item.setActionView(new View(this)); //is a view when item is in expanded state.It is just a dummy view because we will never let it expand

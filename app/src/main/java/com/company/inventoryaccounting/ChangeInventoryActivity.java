@@ -30,6 +30,7 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
     Button btnAddInventory, btnChangeInventory, btnRemoveInventory;
     Spinner spnCurrentOrNewEqup, spnCondition, spnInvResponsible, spnInvPlace;
     ProgressBar progressBar;
+    Toast toastMessage;
 
     Map<String, String> allConditions, allResponsible, allAddresses;
 
@@ -333,6 +334,9 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
         if(receivedEquipData && receivedStaffData && receivedAddressesData){
             progressBar.setVisibility(View.INVISIBLE);
             actViewsEnabled(true);
+            if (toastMessage!= null) {//скрываем сообщение
+                toastMessage.cancel();
+            }
             Intent intent = new Intent(".ToolListActivity");
             startActivity(intent);
             finish();
@@ -377,21 +381,24 @@ public class ChangeInventoryActivity extends AppCompatActivity implements Backgr
             else if(typeFinishedProc.equals("addNewInventory"))
             {
                 if(output.equals("Update successful")) {
-                    Toast.makeText(this, "Добавлен новый инвентарь", Toast.LENGTH_LONG).show();
+                    toastMessage = Toast.makeText(this, "Добавлен новый инвентарь", Toast.LENGTH_LONG);
+                    toastMessage.show();
                     getFreshData();
                 }
             }
             else if(typeFinishedProc.equals("saveEquip"))
             {
                 if(output.equals("Update successful")) {
-                    Toast.makeText(this, "Инвентарь изменен", Toast.LENGTH_LONG).show();
+                    toastMessage = Toast.makeText(this, "Инвентарь изменен", Toast.LENGTH_LONG);
+                    toastMessage.show();
                     getFreshData();
                 }
             }
             else if(typeFinishedProc.equals("removeInventory"))
             {
                 if(output.equals("Update successful")) {
-                    Toast.makeText(this, "Инвентарь удален", Toast.LENGTH_LONG).show();
+                    toastMessage = Toast.makeText(this, "Инвентарь удален", Toast.LENGTH_LONG);
+                    toastMessage.show();
                     getFreshData();
                 }
             }
