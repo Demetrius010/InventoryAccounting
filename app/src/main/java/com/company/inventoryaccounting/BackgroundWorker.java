@@ -35,7 +35,7 @@ public class BackgroundWorker extends AsyncTask<String,Void,String> {
     @Override
     protected String doInBackground(String... params) {
         type = params[0];
-        String ip = "90.188.238.213:8080";//"192.168.1.2:8080";//
+        String ip = "192.168.1.2:8080";//"90.188.238.213:8080";//
         String login_url = "http://"+ip+"/login.php";
         String getEquip_url = "http://"+ip+"/getEquip.php";
         String getStaff_url = "http://"+ip+"/getStaff.php";

@@ -2,8 +2,11 @@ package com.company.inventoryaccounting;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Debug;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +37,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -76,6 +80,9 @@ public class ToolListActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        selectedPlace.clear();
+        selectedEmployee.clear();
+        selectedCategory.clear();
         setContentView(R.layout.activity_tool_list);
         searchEt = (EditText) findViewById(R.id.etSearchByName);
         myLinearLayout = (LinearLayout) findViewById(R.id.linLayout);
@@ -89,11 +96,6 @@ public void onSearchIcon(View view){
     @Override
     protected void onStart() {
         //dynamicSearch = false;
-        selectedPlace.clear();
-        selectedPlace.clear();
-        selectedEmployee.clear();
-        selectedCategory.clear();
-
         fillAddressesDictionary();
         fillCategoryDictionary();
         fillResponsibleDictionary();
@@ -195,8 +197,7 @@ public void onSearchIcon(View view){
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {// выполняем когда выбран определенный пункт меню
-        // Check if no view has focus:
-        View view = this.getCurrentFocus();// скрываем клавиатуру
+        View view = this.getCurrentFocus();// Check if no view has focus:// скрываем клавиатуру
         if (view != null) {
             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -329,7 +330,9 @@ public void onSearchIcon(View view){
                 }
                 else {
                     item.setChecked(true);
-                    selectedCondition.add(item.getTitle().toString());
+                    if(!selectedCondition.contains(item.getTitle().toString())) {
+                        selectedCondition.add(item.getTitle().toString());
+                    }
                 }
                 conditionFilterSubMenu.getItem().setIcon(R.drawable.ic_playlist_add_check_black);
             }
@@ -353,7 +356,9 @@ public void onSearchIcon(View view){
                 }
                 else {
                     item.setChecked(true);
-                    selectedEmployee.add(item.getTitle().toString());
+                    if(!selectedEmployee.contains(item.getTitle().toString())) {
+                        selectedEmployee.add(item.getTitle().toString());
+                    }
                 }
                 employeeFilterSubMenu.getItem().setIcon(R.drawable.ic_playlist_add_check_black);
             }
@@ -407,10 +412,12 @@ public void onSearchIcon(View view){
         }
     }
 
-    private TextView createTextView(String text, final String instrumentID, int nameLength){
+
+    private TextView createTextView(final String text, final String instrumentID, int nameLength){
         LinearLayout.LayoutParams myLinearLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         SpannableString ss;
-        TextView textView = new TextView(this);
+        final MultipleSelection multipleSelection = new MultipleSelection(false);
+        final TextView textView = new TextView(this);
         ss = new SpannableString(text);
         ss.setSpan(new StyleSpan(Typeface.BOLD), 0, nameLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // ДЕЛАЕМ ИМЯ ИНСТРУМЕНТА ЖИРНЫМ
         ss.setSpan(new RelativeSizeSpan(1.5f), 0, nameLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // Устанавливаем размер имени инструмента
@@ -423,12 +430,19 @@ public void onSearchIcon(View view){
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(".ChangeInventoryActivity");
-                intent.putExtra("idInstrument", instrumentID); //in new act in onCreate() {.... variable = getIntent().getExtras().getString("NAME")}
-                startActivity(intent);
+                /*if(multipleSelection.getMultipleSelectionFlag()){
+                    Intent intent = new Intent(".ChangeMultipleInventoryActivity");
+                    startActivity(intent);
+                }
+                else {*/
+                    Intent intent = new Intent(".ChangeInventoryActivity");
+                    intent.putExtra("idInstrument", instrumentID); //in new act in onCreate() {.... variable = getIntent().getExtras().getString("NAME")}
+                    startActivity(intent);
+                //}
             }
         });
-        TypedValue typedValue = new TypedValue(); // добавляем разделительную черту и отступы, устанавливая стиль
+
+        final TypedValue typedValue = new TypedValue(); // добавляем разделительную черту и отступы, устанавливая стиль
         getTheme().resolveAttribute(android.R.attr.editTextBackground, typedValue, true);
         if (typedValue.resourceId != 0) {// it's probably a good idea to check if the color wasn't specified as a resource
             textView.setBackgroundResource(typedValue.resourceId);
@@ -436,6 +450,27 @@ public void onSearchIcon(View view){
             // this should work whether there was a resource id or not
             textView.setBackgroundColor(typedValue.data);
         }
+
+        /*textView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                multipleSelection.setMultipleSelectionFlag(!multipleSelection.getMultipleSelectionFlag());
+                if (multipleSelection.getMultipleSelectionFlag()){
+                    textView.setBackgroundColor(getColor(R.color.colorAccent));
+                    textView.getBackground().setAlpha(125);//отсчет Alpha с 0
+                }
+                else {//иначе возвращаем изначальный стиль с разделительной чертой
+                    if (typedValue.resourceId != 0) {// it's probably a good idea to check if the color wasn't specified as a resource
+                        textView.setBackgroundResource(typedValue.resourceId);
+                    } else {
+                        // this should work whether there was a resource id or not
+                        textView.setBackgroundColor(typedValue.data);
+                    }
+                }
+                return true; //false -> после LongClick срабатывает Click
+            }
+        });*/
+
         return textView;
     } // создаем TextView для отобранного инструмента
 

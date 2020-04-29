@@ -25,6 +25,7 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
     ProgressBar progressBar;
     EditText etShortAddress, etFullAddress;
     String placeID, shortAddress, fullAddress;
+    Toast toastMessage;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,21 +135,24 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
         if(typeFinishedProc.equals("addNewPlace"))
         {
             if(output.equals("Update successful")) {
-                Toast.makeText(this, "Добавлен новый объект", Toast.LENGTH_LONG).show();
+                toastMessage = Toast.makeText(this, "Добавлен новый объект", Toast.LENGTH_LONG);
+                toastMessage.show();
                 getFreshData();
             }
         }
         else if(typeFinishedProc.equals("changePlace"))
         {
             if(output.equals("Update successful")) {
-                Toast.makeText(this, "Объект изменен", Toast.LENGTH_LONG).show();
+                toastMessage = Toast.makeText(this, "Объект изменен", Toast.LENGTH_LONG);
+                toastMessage.show();
                 getFreshData();
             }
         }
         else if(typeFinishedProc.equals("removePlace"))
         {
             if(output.equals("Update successful")) {
-                Toast.makeText(this, "Объект удален", Toast.LENGTH_LONG).show();
+                toastMessage = Toast.makeText(this, "Объект удален", Toast.LENGTH_LONG);
+                toastMessage.show();
                 getFreshData();
             }
             else {
@@ -161,6 +165,9 @@ public class ChangePlaceActivity extends AppCompatActivity implements Background
         else if(typeFinishedProc.equals("getAddresses")){
             ((GlobalInventoryaccounting)this.getApplication()).setAddressesData(output);
             ifAllDataReceived();
+            if (toastMessage!= null) {//скрываем сообщение
+                toastMessage.cancel();
+            }
             Intent intent = new Intent(".PlaceListActivity");
             startActivity(intent);
         }

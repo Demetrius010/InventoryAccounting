@@ -95,17 +95,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ChangeInstrument"
-            android:configChanges="orientation"
-            android:label="Учёт инвентаря"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name=".ChangeInstrument" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name=".ChangePlaceActivity"
             android:configChanges="orientation"
             android:label="Учёт инвентаря"
@@ -137,6 +126,18 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name=".ChangeInventoryActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ChangeMultipleInventoryActivity"
+            android:configChanges="orientation"
+            android:label="Учёт инвентаря"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name=".ChangeMultipleInventoryActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

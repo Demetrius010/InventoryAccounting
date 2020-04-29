@@ -23,6 +23,7 @@ public class ChangeEmployeeActivity extends AppCompatActivity  implements Backgr
     Button btnAddEmployee, btnChangeEmployee, btnRemoveEmployee;
     Spinner spnCurrentOrNewEmployee;
     ProgressBar progressBar;
+    Toast toastMessage;
     EditText etEmployeeName, etEmployeePhone, etEmployeePosition, etEmployeeTeam;
     String employeeID, employeeName, employeePhone, employeePosition, employeeTeam;
     ArrayList<String> positionData, teamData;
@@ -215,21 +216,24 @@ public class ChangeEmployeeActivity extends AppCompatActivity  implements Backgr
         if(typeFinishedProc.equals("addNewEmployee"))
         {
             if(output.equals("Update successful")) {
-                Toast.makeText(this, "Добавлен новый сотрудник", Toast.LENGTH_LONG).show();
+                toastMessage = Toast.makeText(this, "Добавлен новый сотрудник", Toast.LENGTH_LONG);
+                toastMessage.show();
                 getFreshData();
             }
         }
         else if (typeFinishedProc.equals("changeEmployee"))
         {
             if(output.equals("Update successful")) {
-                Toast.makeText(this, "Сотрудник изменен", Toast.LENGTH_LONG).show();
+                toastMessage =  Toast.makeText(this, "Сотрудник изменен", Toast.LENGTH_LONG);
+                toastMessage.show();
                 getFreshData();
             }
         }
         else if(typeFinishedProc.equals("removeEmployee"))
         {
             if(output.equals("Update successful")) {
-                Toast.makeText(this, "Сотрудник удален", Toast.LENGTH_LONG).show();
+                toastMessage =  Toast.makeText(this, "Сотрудник удален", Toast.LENGTH_LONG);
+                toastMessage.show();
                 getFreshData();
             }
             else {
@@ -242,6 +246,9 @@ public class ChangeEmployeeActivity extends AppCompatActivity  implements Backgr
         else if(typeFinishedProc.equals("getStaff")){
             ((GlobalInventoryaccounting)this.getApplication()).setStaffData(output);
             ifAllDataReceived();
+            if (toastMessage!= null) {//скрываем сообщение
+                toastMessage.cancel();
+            }
             Intent intent = new Intent(".StaffListActivity");
             startActivity(intent);
         }

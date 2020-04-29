@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class ChangeInstrument extends AppCompatActivity implements BackgroundWorkerResponse, View.OnTouchListener,
+public class ChangeMultipleInventoryActivity extends AppCompatActivity implements BackgroundWorkerResponse, View.OnTouchListener,
         AdapterView.OnItemClickListener {
     String instrumentId;
     String responsibleData;
@@ -43,9 +43,9 @@ public class ChangeInstrument extends AppCompatActivity implements BackgroundWor
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_change_instrument);
+        setContentView(R.layout.activity_change_multiple_inventory);
 
-        instrumentId = getIntent().getExtras().getString("idInstrument");
+        /*instrumentId = getIntent().getExtras().getString("idInstrument");
         //Log.d("Value", "instrumentId = " + instrumentId);
         etEquipName = (EditText) findViewById(R.id.etEquipName);
         etEquipInventoryNum = (EditText) findViewById(R.id.etEquipInventoryNum);
@@ -70,19 +70,19 @@ public class ChangeInstrument extends AppCompatActivity implements BackgroundWor
                 android.R.layout.simple_list_item_1, list));
         lpw.setAnchorView(etTest);
         lpw.setModal(true);
-        lpw.setOnItemClickListener(this);
+        lpw.setOnItemClickListener(this);*/
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        String item = list[position];
+        /*String item = list[position];
         etTest.setText(item);
-        lpw.dismiss();
+        lpw.dismiss();*/
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        final int DRAWABLE_RIGHT = 2;
+       /* final int DRAWABLE_RIGHT = 2;
 
         if (event.getAction() == MotionEvent.ACTION_UP) {// Check if touch point is in the area of the right button
             if (event.getX() >= (v.getWidth() - ((EditText) v)
@@ -90,23 +90,23 @@ public class ChangeInstrument extends AppCompatActivity implements BackgroundWor
                 lpw.show();// your action here
                 return true;
             }
-        }
+        }*/
         return false;
     }
 
 
     public void fillSpinCondition() {
-        List<String> allConditions =  new ArrayList<String>();
+       /* List<String> allConditions =  new ArrayList<String>();
         allConditions.add("Работает");
         allConditions.add("Сломан");
         allConditions.add("В ремонте");
         dataAdapterForConditions = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allConditions);
         dataAdapterForConditions.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinCondition.setAdapter(dataAdapterForConditions);
+        spinCondition.setAdapter(dataAdapterForConditions);*/
     }
 
     public void fillSpinResponsible() {
-        try {
+        /*try {
             String responsibleFullName, responsibleId;
             allResponsible = new HashMap<String, String>();
             JSONObject jsonObject = new JSONObject(responsibleData);
@@ -123,11 +123,11 @@ public class ChangeInstrument extends AppCompatActivity implements BackgroundWor
 
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     public void fillSpinAddresses() {
-        try {
+        /*try {
             String fullAddress, addressId;
             allAddresses = new HashMap<String, String>();
             JSONObject jsonObject = new JSONObject(addressesData);
@@ -145,20 +145,20 @@ public class ChangeInstrument extends AppCompatActivity implements BackgroundWor
 
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     public void onSave(View view){
-        String type = "saveEquip";
+        /*String type = "saveEquip";
         //Log.d("Value", " type = " + type + " instrumentId = " + instrumentId + " etEquipName = " + etEquipName.getText().toString() + " etEquipInventoryNum = " + etEquipInventoryNum.getText().toString() + " spinResponsible = " + getKeyByValue(allResponsible, spinResponsible.getSelectedItem().toString()) + " spinPlace = " +  getKeyByValue(allAddresses, spinPlace.getSelectedItem().toString()) + " spinCondition = " + spinCondition.getSelectedItem().toString());
         new BackgroundWorker(this, this).execute(type, instrumentId, etEquipName.getText().toString(),
                 etEquipInventoryNum.getText().toString(), getKeyByValue(allResponsible, spinResponsible.getSelectedItem().toString()),
-                getKeyByValue(allAddresses, spinPlace.getSelectedItem().toString()), spinCondition.getSelectedItem().toString());
+                getKeyByValue(allAddresses, spinPlace.getSelectedItem().toString()), spinCondition.getSelectedItem().toString());*/
     }
 
     @Override
     public void processFinish(String output, String typeFinishedProc) {
-        if(output != null){
+        /*if(output != null){
             if (typeFinishedProc.equals("getEquipByID")) {
                 try {
                     String name, inventory_num, responsible, space, equip_condition;
@@ -202,7 +202,7 @@ public class ChangeInstrument extends AppCompatActivity implements BackgroundWor
                 Intent intent = new Intent(".MainMenuActivity");
                 startActivity(intent);
             }
-        }
+        }*/
     }
 
     public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
